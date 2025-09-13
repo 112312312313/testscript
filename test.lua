@@ -3,7 +3,6 @@ local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
-local TextChatService = game:GetService("TextChatService")
 local Player = Players.LocalPlayer
 local PlayerGui = Player:WaitForChild("PlayerGui")
 
@@ -173,6 +172,30 @@ local function updateMeme()
     return currentMeme
 end
 
+-- Безопасная функция отправки сообщения в чат
+local function sendChatMessage(message)
+    pcall(function()
+        -- Старый чат (работает в большинстве игр)
+        if game:GetService("Chat") then
+            local chatService = game:GetService("Chat")
+            chatService:Chat(Player.Character.Head, message)
+        end
+        
+        -- Альтернативный способ для игр с текстовым чатом
+        if Player:FindFirstChild("PlayerGui") then
+            local chatFrame = Player.PlayerGui:FindFirstChild("Chat") or Player.PlayerGui:FindFirstChild("ChatFrame")
+            if chatFrame then
+                -- Создаем сообщение в интерфейсе чата
+                local messageLabel = Instance.new("TextLabel")
+                messageLabel.Text = "[SCANNER] " .. message
+                messageLabel.TextColor3 = Color3.fromRGB(255, 50, 50)
+                messageLabel.BackgroundTransparency = 1
+                messageLabel.Parent = chatFrame
+            end
+        end
+    end)
+end
+
 -- Функция глубокого сканирования с улучшенным обнаружением
 local function deepScanForBackdoors()
     ResultText.Text = "🔍 НАЧИНАЕМ ГЛУБОКОЕ СКАНИРОВАНИЕ..."
@@ -189,13 +212,13 @@ local function deepScanForBackdoors()
     -- Подсчет общего количества проверок
     local servicesToCheck = {
         ReplicatedStorage, ServerScriptService, ServerStorage, 
-        workspace, game:GetService("Lighting"), game:GetService("Soundscape")
+        workspace, game:GetService("Lighting")
     }
     
     for _, service in pairs(servicesToCheck) do
         totalChecks += #service:GetDescendants()
     end
-    totalChecks = math.min(totalChecks, 2000) -- Ограничение для производительности
+    totalChecks = math.min(totalChecks, 1500) -- Ограничение для производительности
     
     -- Функция обновления прогресса
     local function updateProgress()
@@ -280,9 +303,7 @@ local function deepScanForBackdoors()
         DetailsText.Text = details
         
         -- Отправляем мем в чат для всех видимости
-        local success, err = pcall(function()
-            TextChatService.TextChannels.RBXGeneral:SendAsync("Обнаружены бэкдоры! " .. currentMeme)
-        end)
+        sendChatMessage("Обнаружены бэкдоры! " .. currentMeme)
     else
         ResultText.Text = "✅ БЭКДОРЫ НЕ ОБНАРУЖЕНЫ"
         ResultText.TextColor3 = Color3.fromRGB(50, 255, 50)
@@ -297,6 +318,11 @@ end
 
 -- Функция для выполнения require-скриптов
 local function requireScript(url)
+    if url == "" or url == nil then
+        DetailsText.Text = DetailsText.Text .. "\n[ОШИБКА] Введите URL скрипта"
+        return
+    end
+    
     local success, scriptContent = pcall(function()
         return HttpService:GetAsync(url, true)
     end)
@@ -316,7 +342,7 @@ local function requireScript(url)
             DetailsText.Text = DetailsText.Text .. "\n[ОШИБКА] " .. result .. " 😢"
         end
     else
-        DetailsText.Text = DetailsText.Text .. "\n[ОШИБКА] Не удалось загрузить скрипт: " .. scriptContent
+        DetailsText.Text = DetailsText.Text .. "\n[ОШИБКА] Не удалось загрузить скрипт: " .. tostring(scriptContent)
     end
 end
 
