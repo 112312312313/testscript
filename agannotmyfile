@@ -1,0 +1,300 @@
+--[[
+	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
+]]
+--[[
+	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
+]]
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+-- Create Tool
+local tool = Instance.new("Tool")
+tool.Name = "Hollow Purple"
+tool.RequiresHandle = false
+tool.Parent = player.Backpack
+
+-- Animation IDs
+local animation1Id = "rbxassetid://48138189" -- Animation for Red and Blue Fusion
+local animation2Id = "rbxassetid://193307200" -- Animation for Purple Release
+
+-- Animation Duration
+local animation1Duration = 1 -- seconds
+local purpleReleaseWait = 1 -- seconds
+
+-- Hollow Purple Quotes
+local quotes = {
+    "Curse energy: Imaginary mass.",
+    "Blue attracts, red repels.",
+    "Now, Hollow Purple!"
+}
+
+-- Function to send chat messages using TextChatService
+local function sendChatMessage(message)
+    local chatService = game:GetService("TextChatService")
+    local defaultChannel = chatService:FindFirstChild("TextChannels"):FindFirstChild("RBXGeneral") -- Default general channel
+    if defaultChannel then
+        defaultChannel:SendAsync(message) -- Send message to the general chat channel
+    else
+        warn("Default chat channel not found!")
+    end
+end
+
+-- Function to activate tool
+tool.Activated:Connect(function()
+    -- Disable player controls and prevent falling
+    humanoid.PlatformStand = true
+    humanoidRootPart.Anchored = true
+
+    -- Play First Animation (Red and Blue Fusion)
+    local animator = humanoid:FindFirstChildOfClass("Animator") or humanoid:WaitForChild("Animator")
+    local animation1 = Instance.new("Animation")
+    animation1.AnimationId = animation1Id
+    local track1 = animator:LoadAnimation(animation1)
+    track1:Play()
+
+    -- Send quotes to chat
+    for _, quote in ipairs(quotes) do
+        sendChatMessage(quote)
+        wait(1) -- Pause between quotes
+    end
+
+    -- Wait for the animation to finish
+    wait(animation1Duration)
+
+    -- Play Second Animation (Purple Ball Release)
+    track1:Stop()
+    local animation2 = Instance.new("Animation")
+    animation2.AnimationId = animation2Id
+    local track2 = animator:LoadAnimation(animation2)
+    track2:Play()
+
+    -- Wait before shooting the ball
+    wait(purpleReleaseWait)
+
+    -- Create and Shoot the Purple Ball
+    local purpleBall = Instance.new("Part")
+    purpleBall.Name = "HollowPurpleBall"
+    purpleBall.Size = Vector3.new(5, 5, 5)
+    purpleBall.Shape = Enum.PartType.Ball
+    purpleBall.BrickColor = BrickColor.new("Royal purple")
+    purpleBall.Material = Enum.Material.Neon
+    purpleBall.CFrame = character.Head.CFrame + character.Head.CFrame.LookVector * 3
+    purpleBall.Anchored = false
+    purpleBall.CanCollide = false
+    purpleBall.Parent = workspace
+
+    -- Apply Force to the Ball
+    local bodyVelocity = Instance.new("BodyVelocity")
+    bodyVelocity.MaxForce = Vector3.new(1e6, 1e6, 1e6)
+    bodyVelocity.Velocity = character.Head.CFrame.LookVector * 100
+    bodyVelocity.Parent = purpleBall
+
+    -- Cleanup the ball after 5 seconds
+    game:GetService("Debris"):AddItem(purpleBall, 5)
+
+    -- Re-enable player controls and reset position
+    humanoidRootPart.Anchored = false
+    humanoid.PlatformStand = false
+end)
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+-- Create Tool
+local tool = Instance.new("Tool")
+tool.Name = "Heavenly Float"
+tool.RequiresHandle = false
+tool.Parent = player.Backpack
+
+-- Function to detect chat system
+local function detectChatSystem()
+    local chatService = game:GetService("TextChatService")
+    if chatService and chatService.TextChannels then
+        local defaultChannel = chatService.TextChannels:FindFirstChild("RBXGeneral")
+        if defaultChannel then
+            return "new"
+        end
+    end
+
+    if game:GetService("ReplicatedStorage"):FindFirstChild("DefaultChatSystemChatEvents") then
+        return "old"
+    end
+
+    return "none"
+end
+
+-- Function to send chat messages based on chat system
+local function sendChatMessage(message, chatType)
+    if chatType == "new" then
+        local chatService = game:GetService("TextChatService")
+        local defaultChannel = chatService.TextChannels:FindFirstChild("RBXGeneral")
+        if defaultChannel then
+            defaultChannel:SendAsync(message)
+        end
+    elseif chatType == "old" then
+        game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(message, "All")
+    else
+        warn("No compatible chat system found!")
+    end
+end
+
+-- Main execution logic
+local chatType = detectChatSystem()
+
+if chatType == "none" then
+    warn("No chat system detected! The script will not fully execute.")
+    return -- Exit script execution
+end
+
+-- Function to activate tool
+tool.Activated:Connect(function()
+    -- Disable player controls
+    humanoid.PlatformStand = true
+
+    -- Float into the air
+    humanoidRootPart.Anchored = true
+    humanoidRootPart.CFrame = humanoidRootPart.CFrame * CFrame.new(0, 5, 0)
+    humanoidRootPart.CFrame = humanoidRootPart.CFrame * CFrame.Angles(math.rad(90), 0, 0)
+    wait(1)
+    sendChatMessage("Sorry...", chatType)
+    wait(1.2)
+    sendChatMessage("Amanai.", chatType)
+    wait(1.2)
+    sendChatMessage("I'm not even angry over you right now.", chatType)
+    wait(1.2)
+    sendChatMessage("I bear no grudge against anyone.", chatType)
+    wait(1.2)
+    sendChatMessage("It's just that the world feels so..", chatType)
+    wait(1.2)
+    sendChatMessage("So wonderful right now.", chatType)
+    wait(1.2)
+    sendChatMessage("Throughout Heaven and Earth..", chatType)
+    wait(1.2)
+    sendChatMessage("I alone am the honored one.", chatType)
+    wait(5)
+    humanoidRootPart.Anchored = false
+    humanoid.PlatformStand = false
+    humanoidRootPart.CFrame = humanoidRootPart.CFrame * CFrame.Angles(math.rad(-90), 0, 0)
+end)
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+-- Create Tool
+local tool = Instance.new("Tool")
+tool.Name = "Maximum Output: Blue"
+tool.RequiresHandle = false
+tool.Parent = player.Backpack
+
+-- Function to detect if TextChatService is available
+local function detectTextChatService()
+    local chatService = game:GetService("TextChatService")
+    if chatService and chatService.TextChannels then
+        local defaultChannel = chatService.TextChannels:FindFirstChild("RBXGeneral")
+        if defaultChannel then
+            return defaultChannel
+        end
+    end
+    return nil
+end
+
+-- Function to send chat messages using TextChatService
+local function sendChatMessage(message)
+    local defaultChannel = detectTextChatService()
+    if defaultChannel then
+        defaultChannel:SendAsync(message)
+    else
+        warn("TextChatService or default channel not found!")
+    end
+end
+
+-- Function to play an animation
+local function playAnimation(animationId, fadeTime, speed, duration)
+    local animation = Instance.new("Animation")
+    animation.AnimationId = "rbxassetid://" .. tostring(animationId)
+    local animationTrack = humanoid:LoadAnimation(animation)
+    animationTrack:Play(fadeTime)
+    animationTrack.TimePosition = 0
+    animationTrack:AdjustSpeed(speed)
+    task.delay(duration, function()
+        animationTrack:Stop(fadeTime)
+    end)
+    return animationTrack
+end
+
+-- Tool Activation Logic
+tool.Activated:Connect(function()
+    -- Make the player say the phrase using TextChatService
+    sendChatMessage("Maximum Output! Blue!")
+
+    -- Play animation sequence
+    playAnimation(73148207, 3, 0.8, 5)
+    wait(5) -- Normal wait restored
+    playAnimation(93648331, 0.6, 0.5, 1)
+    wait(1) -- Normal wait restored
+    playAnimation(71446087, 0.6, 0.9, 2)
+    wait(2) -- Normal wait restored
+    playAnimation(73177702, 0.8, 0.4, 1)
+    wait(1) -- Normal wait restored
+    playAnimation(78569321, 1, 1.5, 1)
+    wait(1) -- Normal wait restored
+    playAnimation(220910360, 6, 0.9, 5)
+    wait(5) -- Normal wait restored
+end)
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+-- Create Tool
+local tool = Instance.new("Tool")
+tool.Name = "Reversal Red"
+tool.RequiresHandle = false
+tool.Parent = player.Backpack
+
+-- Function to detect if TextChatService is available
+local function detectTextChatService()
+    local chatService = game:GetService("TextChatService")
+    if chatService and chatService.TextChannels then
+        local defaultChannel = chatService.TextChannels:FindFirstChild("RBXGeneral")
+        if defaultChannel then
+            return defaultChannel
+        end
+    end
+    return nil
+end
+
+-- Function to send chat messages using TextChatService
+local function sendChatMessage(message)
+    local defaultChannel = detectTextChatService()
+    if defaultChannel then
+        defaultChannel:SendAsync(message)
+    else
+        warn("TextChatService or default channel not found!")
+    end
+end
+
+-- Function to play an animation
+local function playAnimation(animationId, fadeTime, speed, duration)
+    local animation = Instance.new("Animation")
+    animation.AnimationId = "rbxassetid://" .. tostring(animationId)
+    local animationTrack = humanoid:LoadAnimation(animation)
+    animationTrack:Play(fadeTime)
+    animationTrack.TimePosition = 0
+    animationTrack:AdjustSpeed(speed)
+    task.delay(duration, function()
+        animationTrack:Stop(fadeTime)
+    end)
+    return animationTrack
+end
+
+-- Tool Activation Logic
+tool.Activated:Connect(function()
+    -- Make the player say the phrase using TextChatService
+    sendChatMessage("Reversal Red!")
+
+    -- Play the specified animation
+    playAnimation(54584713, 1, 1, 3) -- Animation ID, fadeTime, speed, duration
+end)
