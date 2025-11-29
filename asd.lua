@@ -1,4 +1,4 @@
--- Полный чит LOOOL с правильной ссылкой Rayfield
+-- Полный чит LOOOL без анимаций
 local Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/jensonhirst/Rayfield/refs/heads/main/source"))()
 
 local Window = Rayfield:CreateWindow({
@@ -346,35 +346,6 @@ VisualTab:CreateToggle({
    CurrentValue = false,
    Callback = function(Value)
         getgenv().InfJump = Value
-   end,
-})
-
--- Анимации
-VisualTab:CreateDropdown({
-   Name = "💃 Анимации",
-   Options = {"Попрыгунчик", "Танец1", "Танец2", "Стойка", "Зомби"},
-   CurrentOption = "Выбери анимацию",
-   Callback = function(Option)
-        SafeCall(function()
-            local animationIds = {
-                ["Попрыгунчик"] = "rbxassetid://35154961",
-                ["Танец1"] = "rbxassetid://182435998", 
-                ["Танец2"] = "rbxassetid://204295235",
-                ["Стойка"] = "rbxassetid://313762630",
-                ["Зомби"] = "rbxassetid://2510239857"
-            }
-            
-            if animationIds[Option] then
-                local anim = Instance.new("Animation")
-                anim.AnimationId = animationIds[Option]
-                
-                local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-                if hum then
-                    local track = hum:LoadAnimation(anim)
-                    track:Play()
-                end
-            end
-        end)
    end,
 })
 
