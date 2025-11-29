@@ -1,5 +1,5 @@
--- Полный чит LOOOL без анимаций
-local Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/jensonhirst/Rayfield/refs/heads/main/source"))()
+-- LOOOL Чит для Roblox - исправленная версия
+local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/jensonhirst/Rayfield/refs/heads/main/source'))()
 
 local Window = Rayfield:CreateWindow({
    Name = "LOOOOL 🚀",
@@ -7,7 +7,7 @@ local Window = Rayfield:CreateWindow({
    LoadingSubtitle = "ALL LOAD!",
    ConfigurationSaving = {
       Enabled = true,
-      FolderName = "LOOOOL", 
+      FolderName = "LOOOOL",
       FileName = "Config"
    },
    Discord = {
@@ -26,7 +26,7 @@ getgenv().ESP = false
 getgenv().Invisible = false
 getgenv().InfJump = false
 
--- ОПТИМИЗАЦИЯ: Отключаем тени и детализацию
+-- ОПТИМИЗАЦИЯ
 local Lighting = game:GetService("Lighting")
 Lighting.GlobalShadows = false
 Lighting.ShadowSoftness = 0
@@ -393,7 +393,7 @@ CommandsTab:CreateButton({
 -- Уведомление о загрузке
 Rayfield:Notify({
    Title = "LOOOOL Загружен!",
-   Content = "ALL LOAD! Все функции активированы\n🔥 Оптимизация включена\n🔄 Spinbot готов\n👻 Невидимость работает",
+   Content = "ALL LOAD! Все функции активированы",
    Duration = 6.5,
    Image = 4483362458,
 })
