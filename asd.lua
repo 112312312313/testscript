@@ -1,22 +1,30 @@
--- LOOOL Чит для Roblox - исправленная версия
-local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/jensonhirst/Rayfield/refs/heads/main/source'))()
+-- LOOOL Чит для мобильных устройств
+-- Простая версия без сложных библиотек
 
-local Window = Rayfield:CreateWindow({
-   Name = "LOOOOL 🚀",
-   LoadingTitle = "Загрузка...",
-   LoadingSubtitle = "ALL LOAD!",
-   ConfigurationSaving = {
-      Enabled = true,
-      FolderName = "LOOOOL",
-      FileName = "Config"
-   },
-   Discord = {
-      Enabled = false,
-      Invite = "noinvite",
-      RememberJoins = true
-   },
-   KeySystem = false
-})
+-- Создаем простой GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "LOOOOLMobile"
+ScreenGui.Parent = game.CoreGui
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 300, 0, 400)
+MainFrame.Position = UDim2.new(0, 10, 0, 10)
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.Parent = ScreenGui
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.Position = UDim2.new(0, 0, 0, 0)
+Title.Text = "LOOOOL 🚀 MOBILE"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+Title.Parent = MainFrame
+
+local ScrollingFrame = Instance.new("ScrollingFrame")
+ScrollingFrame.Size = UDim2.new(1, 0, 1, -40)
+ScrollingFrame.Position = UDim2.new(0, 0, 0, 40)
+ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 800)
+ScrollingFrame.Parent = MainFrame
 
 -- Глобальные переменные
 getgenv().Noclip = false
@@ -26,403 +34,280 @@ getgenv().ESP = false
 getgenv().Invisible = false
 getgenv().InfJump = false
 
--- ОПТИМИЗАЦИЯ
-local Lighting = game:GetService("Lighting")
-Lighting.GlobalShadows = false
-Lighting.ShadowSoftness = 0
-Lighting.Brightness = 2
-
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local RunService = game:GetService("RunService")
 
--- Функция для безопасного выполнения
-local function SafeCall(func)
-    pcall(func)
+-- Функция создания кнопки
+local function CreateButton(text, yPosition, callback)
+    local Button = Instance.new("TextButton")
+    Button.Size = UDim2.new(0.9, 0, 0, 40)
+    Button.Position = UDim2.new(0.05, 0, 0, yPosition)
+    Button.Text = text
+    Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Button.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+    Button.Parent = ScrollingFrame
+    
+    Button.MouseButton1Click:Connect(function()
+        pcall(callback)
+    end)
 end
 
--- Главные функции
-local MainTab = Window:CreateTab("Главные функции", 4483362458)
+-- Функция создания переключателя
+local function CreateToggle(text, yPosition)
+    local ToggleFrame = Instance.new("Frame")
+    ToggleFrame.Size = UDim2.new(0.9, 0, 0, 40)
+    ToggleFrame.Position = UDim2.new(0.05, 0, 0, yPosition)
+    ToggleFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    ToggleFrame.Parent = ScrollingFrame
+    
+    local ToggleLabel = Instance.new("TextLabel")
+    ToggleLabel.Size = UDim2.new(0.7, 0, 1, 0)
+    ToggleLabel.Position = UDim2.new(0, 0, 0, 0)
+    ToggleLabel.Text = text
+    ToggleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ToggleLabel.BackgroundTransparency = 1
+    ToggleLabel.Parent = ToggleFrame
+    
+    local ToggleButton = Instance.new("TextButton")
+    ToggleButton.Size = UDim2.new(0.2, 0, 0.6, 0)
+    ToggleButton.Position = UDim2.new(0.75, 0, 0.2, 0)
+    ToggleButton.Text = "OFF"
+    ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ToggleButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    ToggleButton.Parent = ToggleFrame
+    
+    return ToggleButton
+end
 
--- REAL FE НЕВИДИМОСТЬ
-MainTab:CreateToggle({
-   Name = "🔥 REAL FE Невидимость",
-   CurrentValue = false,
-   Callback = function(Value)
-        getgenv().Invisible = Value
-        SafeCall(function()
-            local char = LocalPlayer.Character
-            if char then
-                for _, part in ipairs(char:GetDescendants()) do
-                    if part:IsA("BasePart") then
-                        part.Transparency = Value and 1 or 0
-                        part.CanCollide = not Value
-                    end
+-- Создаем функции
+local yPos = 10
+
+-- Невидимость
+local InvisibleToggle = CreateToggle("👻 Невидимость", yPos)
+yPos = yPos + 50
+
+InvisibleToggle.MouseButton1Click:Connect(function()
+    if InvisibleToggle.Text == "OFF" then
+        InvisibleToggle.Text = "ON"
+        InvisibleToggle.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        getgenv().Invisible = true
+        local char = LocalPlayer.Character
+        if char then
+            for _, part in ipairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.Transparency = 1
+                    part.CanCollide = false
                 end
             end
-        end)
-   end,
-})
-
--- SPINBOT (Жесткий)
-MainTab:CreateToggle({
-   Name = "🔄 SPINBOT (Жесткий)",
-   CurrentValue = false,
-   Callback = function(Value)
-        getgenv().Spinbot = Value
-        SafeCall(function()
-            spawn(function()
-                while getgenv().Spinbot do
-                    RunService.RenderStepped:Wait()
-                    local char = LocalPlayer.Character
-                    if char then
-                        local root = char:FindFirstChild("HumanoidRootPart")
-                        if root then
-                            root.CFrame = root.CFrame * CFrame.Angles(0, math.rad(50), 0)
-                        end
-                    end
+        end
+    else
+        InvisibleToggle.Text = "OFF"
+        InvisibleToggle.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        getgenv().Invisible = false
+        local char = LocalPlayer.Character
+        if char then
+            for _, part in ipairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.Transparency = 0
+                    part.CanCollide = true
                 end
-            end)
-        end)
-   end,
-})
+            end
+        end
+    end
+end)
 
--- Легание (Noclip)
-MainTab:CreateToggle({
-   Name = "👻 Легание (Noclip)",
-   CurrentValue = false,
-   Callback = function(Value)
-        getgenv().Noclip = Value
-        SafeCall(function()
-            RunService.Stepped:Connect(function()
-                if getgenv().Noclip and LocalPlayer.Character then
-                    for _, part in ipairs(LocalPlayer.Character:GetDescendants()) do
-                        if part:IsA("BasePart") then
-                            part.CanCollide = false
-                        end
-                    end
-                end
-            end)
-        end)
-   end,
-})
+-- Spinbot
+local SpinbotToggle = CreateToggle("🔄 Spinbot", yPos)
+yPos = yPos + 50
 
--- Полёт (Fly)
-MainTab:CreateToggle({
-   Name = "🚀 Полёт (Fly)",
-   CurrentValue = false,
-   Callback = function(Value)
-        getgenv().Fly = Value
-        SafeCall(function()
-            if Value then
+SpinbotToggle.MouseButton1Click:Connect(function()
+    if SpinbotToggle.Text == "OFF" then
+        SpinbotToggle.Text = "ON"
+        SpinbotToggle.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        getgenv().Spinbot = true
+        spawn(function()
+            while getgenv().Spinbot do
+                RunService.RenderStepped:Wait()
                 local char = LocalPlayer.Character
                 if char then
                     local root = char:FindFirstChild("HumanoidRootPart")
                     if root then
-                        local bodyVelocity = Instance.new("BodyVelocity")
-                        bodyVelocity.Velocity = Vector3.new(0, 0, 0)
-                        bodyVelocity.MaxForce = Vector3.new(40000, 40000, 40000)
-                        bodyVelocity.Parent = root
-                        
-                        spawn(function()
-                            local UIS = game:GetService("UserInputService")
-                            while getgenv().Fly and root do
-                                RunService.RenderStepped:Wait()
-                                bodyVelocity.Velocity = Vector3.new(0, 0, 0)
-                                
-                                if UIS:IsKeyDown(Enum.KeyCode.W) then
-                                    bodyVelocity.Velocity = bodyVelocity.Velocity + (workspace.CurrentCamera.CFrame.LookVector * 100)
-                                end
-                                if UIS:IsKeyDown(Enum.KeyCode.S) then
-                                    bodyVelocity.Velocity = bodyVelocity.Velocity - (workspace.CurrentCamera.CFrame.LookVector * 100)
-                                end
-                                if UIS:IsKeyDown(Enum.KeyCode.A) then
-                                    bodyVelocity.Velocity = bodyVelocity.Velocity - (workspace.CurrentCamera.CFrame.RightVector * 100)
-                                end
-                                if UIS:IsKeyDown(Enum.KeyCode.D) then
-                                    bodyVelocity.Velocity = bodyVelocity.Velocity + (workspace.CurrentCamera.CFrame.RightVector * 100)
-                                end
-                                if UIS:IsKeyDown(Enum.KeyCode.Space) then
-                                    bodyVelocity.Velocity = bodyVelocity.Velocity + Vector3.new(0, 100, 0)
-                                end
-                                if UIS:IsKeyDown(Enum.KeyCode.LeftShift) then
-                                    bodyVelocity.Velocity = bodyVelocity.Velocity - Vector3.new(0, 100, 0)
-                                end
-                            end
-                            bodyVelocity:Destroy()
-                        end)
+                        root.CFrame = root.CFrame * CFrame.Angles(0, math.rad(30), 0)
                     end
                 end
             end
         end)
-   end,
-})
-
--- Телепортация к игрокам
-local playerNames = {}
-for _, player in ipairs(Players:GetPlayers()) do
-    if player ~= LocalPlayer then
-        table.insert(playerNames, player.Name)
+    else
+        SpinbotToggle.Text = "OFF"
+        SpinbotToggle.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        getgenv().Spinbot = false
     end
-end
+end)
 
-local PlayerDropdown = MainTab:CreateDropdown({
-   Name = "🎯 Телепорт к игроку",
-   Options = playerNames,
-   CurrentOption = playerNames[1] or "Нет игроков",
-   Callback = function(Option)
-        SafeCall(function()
-            local target = Players[Option]
-            if target and target.Character then
-                local targetRoot = target.Character:FindFirstChild("HumanoidRootPart")
-                local localRoot = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-                if targetRoot and localRoot then
-                    localRoot.CFrame = targetRoot.CFrame
-                end
-            end
-        end)
-   end,
-})
+-- Легание (Noclip)
+local NoclipToggle = CreateToggle("👻 Легание", yPos)
+yPos = yPos + 50
 
--- Массовая телепортация ко мне
-MainTab:CreateButton({
-   Name = "⚡ Телепортировать ВСЕХ ко мне",
-   Callback = function()
-        SafeCall(function()
-            local myRoot = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-            if myRoot then
-                for _, player in ipairs(Players:GetPlayers()) do
-                    if player ~= LocalPlayer and player.Character then
-                        local targetRoot = player.Character:FindFirstChild("HumanoidRootPart")
-                        if targetRoot then
-                            targetRoot.CFrame = myRoot.CFrame + Vector3.new(math.random(-5, 5), 0, math.random(-5, 5))
-                        end
+NoclipToggle.MouseButton1Click:Connect(function()
+    if NoclipToggle.Text == "OFF" then
+        NoclipToggle.Text = "ON"
+        NoclipToggle.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        getgenv().Noclip = true
+        RunService.Stepped:Connect(function()
+            if getgenv().Noclip and LocalPlayer.Character then
+                for _, part in ipairs(LocalPlayer.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
                     end
                 end
             end
         end)
-   end,
-})
+    else
+        NoclipToggle.Text = "OFF"
+        NoclipToggle.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        getgenv().Noclip = false
+    end
+end)
 
--- Телепорт по координатам (квадрат)
-MainTab:CreateSection("📍 Телепорт по координатам")
-local XInput = MainTab:CreateInput({
-   Name = "Центр X",
-   PlaceholderText = "0",
-   Callback = function(Text) end,
-})
+-- ESP
+local ESPToggle = CreateToggle("🎯 ESP", yPos)
+yPos = yPos + 50
 
-local YInput = MainTab:CreateInput({
-   Name = "Центр Y", 
-   PlaceholderText = "0",
-   Callback = function(Text) end,
-})
-
-local ZInput = MainTab:CreateInput({
-   Name = "Центр Z",
-   PlaceholderText = "0",
-   Callback = function(Text) end,
-})
-
-local SizeInput = MainTab:CreateInput({
-   Name = "Размер квадрата",
-   PlaceholderText = "50",
-   Callback = function(Text) end,
-})
-
-MainTab:CreateButton({
-   Name = "🔄 Телепорт в квадрат",
-   Callback = function()
-        SafeCall(function()
-            local centerX = tonumber(XInput:GetValue()) or 0
-            local centerY = tonumber(YInput:GetValue()) or 0
-            local centerZ = tonumber(ZInput:GetValue()) or 0
-            local size = tonumber(SizeInput:GetValue()) or 50
-            
-            local randomX = centerX + math.random(-size/2, size/2)
-            local randomZ = centerZ + math.random(-size/2, size/2)
-            
-            local root = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-            if root then
-                root.CFrame = CFrame.new(Vector3.new(randomX, centerY, randomZ))
-            end
-        end)
-   end,
-})
-
--- Визуальные функции
-local VisualTab = Window:CreateTab("Визуал", 4483362458)
-
--- ESP с Highlight
-VisualTab:CreateToggle({
-   Name = "🎯 ESP игроков",
-   CurrentValue = false,
-   Callback = function(Value)
-        getgenv().ESP = Value
-        SafeCall(function()
-            if Value then
-                for _, player in ipairs(Players:GetPlayers()) do
-                    if player ~= LocalPlayer then
-                        spawn(function()
-                            while getgenv().ESP and player and player.Character do
-                                RunService.RenderStepped:Wait()
-                                local char = player.Character
-                                if char then
-                                    local highlight = char:FindFirstChildOfClass("Highlight")
-                                    if not highlight then
-                                        highlight = Instance.new("Highlight")
-                                        highlight.FillColor = Color3.fromRGB(255, 0, 0)
-                                        highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-                                        highlight.Parent = char
-                                    end
-                                    highlight.Adornee = char
-                                end
-                            end
-                        end)
-                    end
-                end
-            else
-                for _, player in ipairs(Players:GetPlayers()) do
-                    if player.Character then
-                        local highlight = player.Character:FindFirstChildOfClass("Highlight")
-                        if highlight then
-                            highlight:Destroy()
-                        end
-                    end
-                end
-            end
-        end)
-   end,
-})
-
--- Скорость движения
-VisualTab:CreateSlider({
-   Name = "💨 Скорость движения",
-   Range = {16, 500},
-   Increment = 1,
-   Suffix = "speed",
-   CurrentValue = 16,
-   Callback = function(Value)
-        SafeCall(function()
-            LocalPlayer.Character.Humanoid.WalkSpeed = Value
-        end)
-   end,
-})
-
--- Сила прыжка
-VisualTab:CreateSlider({
-   Name = "🦘 Сила прыжка",
-   Range = {50, 500},
-   Increment = 1,
-   Suffix = "jump", 
-   CurrentValue = 50,
-   Callback = function(Value)
-        SafeCall(function()
-            LocalPlayer.Character.Humanoid.JumpPower = Value
-        end)
-   end,
-})
-
--- Бессмертие
-VisualTab:CreateToggle({
-   Name = "💀 Бессмертие",
-   CurrentValue = false,
-   Callback = function(Value)
-        SafeCall(function()
-            if Value then
-                LocalPlayer.Character.Humanoid.MaxHealth = math.huge
-                LocalPlayer.Character.Humanoid.Health = math.huge
-            else
-                LocalPlayer.Character.Humanoid.MaxHealth = 100
-                LocalPlayer.Character.Humanoid.Health = 100
-            end
-        end)
-   end,
-})
-
--- Бесконечный прыжок
-VisualTab:CreateToggle({
-   Name = "∞ Бесконечный прыжок",
-   CurrentValue = false,
-   Callback = function(Value)
-        getgenv().InfJump = Value
-   end,
-})
-
--- Команды в чат
-local CommandsTab = Window:CreateTab("Команды", 4483362458)
-
-CommandsTab:CreateInput({
-   Name = "Команда в чат",
-   PlaceholderText = "Напиши команду...",
-   Callback = function(Text)
-        SafeCall(function()
-            game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(Text, "All")
-        end)
-   end,
-})
-
--- Килл всех
-CommandsTab:CreateButton({
-   Name = "☠️ Убить всех",
-   Callback = function()
-        SafeCall(function()
-            for _, player in ipairs(Players:GetPlayers()) do
-                if player ~= LocalPlayer and player.Character then
-                    player.Character:BreakJoints()
-                end
-            end
-        end)
-   end,
-})
-
--- Респавн всех
-CommandsTab:CreateButton({
-   Name = "🔄 Респавн всех",
-   Callback = function()
-        SafeCall(function()
-            for _, player in ipairs(Players:GetPlayers()) do
-                if player.Character then
-                    player.Character:BreakJoints()
-                end
-            end
-        end)
-   end,
-})
-
--- Уведомление о загрузке
-Rayfield:Notify({
-   Title = "LOOOOL Загружен!",
-   Content = "ALL LOAD! Все функции активированы",
-   Duration = 6.5,
-   Image = 4483362458,
-})
-
--- Авто-обновление списка игроков
-spawn(function()
-    while true do
-        wait(5)
-        local newPlayers = {}
+ESPToggle.MouseButton1Click:Connect(function()
+    if ESPToggle.Text == "OFF" then
+        ESPToggle.Text = "ON"
+        ESPToggle.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        getgenv().ESP = true
         for _, player in ipairs(Players:GetPlayers()) do
             if player ~= LocalPlayer then
-                table.insert(newPlayers, player.Name)
+                spawn(function()
+                    while getgenv().ESP and player and player.Character do
+                        RunService.RenderStepped:Wait()
+                        local char = player.Character
+                        if char then
+                            local highlight = char:FindFirstChildOfClass("Highlight")
+                            if not highlight then
+                                highlight = Instance.new("Highlight")
+                                highlight.FillColor = Color3.fromRGB(255, 0, 0)
+                                highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+                                highlight.Parent = char
+                            end
+                            highlight.Adornee = char
+                        end
+                    end
+                end)
             end
         end
-        if #newPlayers > 0 then
-            PlayerDropdown:Refresh(newPlayers, true)
+    else
+        ESPToggle.Text = "OFF"
+        ESPToggle.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        getgenv().ESP = false
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player.Character then
+                local highlight = player.Character:FindFirstChildOfClass("Highlight")
+                if highlight then
+                    highlight:Destroy()
+                end
+            end
         end
     end
 end)
 
--- Обработчик бесконечного прыжка
-game:GetService("UserInputService").JumpRequest:connect(function()
-    if getgenv().InfJump then
-        LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+-- Кнопки
+CreateButton("💨 Скорость +50", yPos, function()
+    local char = LocalPlayer.Character
+    if char then
+        char.Humanoid.WalkSpeed = char.Humanoid.WalkSpeed + 50
+    end
+end)
+yPos = yPos + 50
+
+CreateButton("🦘 Прыжок +50", yPos, function()
+    local char = LocalPlayer.Character
+    if char then
+        char.Humanoid.JumpPower = char.Humanoid.JumpPower + 50
+    end
+end)
+yPos = yPos + 50
+
+CreateButton("💀 Бессмертие", yPos, function()
+    local char = LocalPlayer.Character
+    if char then
+        char.Humanoid.MaxHealth = math.huge
+        char.Humanoid.Health = math.huge
+    end
+end)
+yPos = yPos + 50
+
+CreateButton("⚡ Телепорт ко всем", yPos, function()
+    local myRoot = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if myRoot then
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character then
+                local targetRoot = player.Character:FindFirstChild("HumanoidRootPart")
+                if targetRoot then
+                    targetRoot.CFrame = myRoot.CFrame
+                end
+            end
+        end
+    end
+end)
+yPos = yPos + 50
+
+CreateButton("☠️ Убить всех", yPos, function()
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character then
+            player.Character:BreakJoints()
+        end
+    end
+end)
+yPos = yPos + 50
+
+CreateButton("🔄 Респавн всех", yPos, function()
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player.Character then
+            player.Character:BreakJoints()
+        end
+    end
+end)
+yPos = yPos + 50
+
+-- Перемещение GUI
+local dragging = false
+local dragInput, dragStart, startPos
+
+Title.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+        
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+Title.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
     end
 end)
 
 -- Защита от кика
-LocalPlayer.Idled:connect(function()
+LocalPlayer.Idled:Connect(function()
     VirtualUser:CaptureController()
     VirtualUser:ClickButton2(Vector2.new())
 end)
+
+print("LOOOOL MOBILE loaded! ALL LOAD!")
