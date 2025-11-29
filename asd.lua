@@ -1,5 +1,5 @@
--- Полный оптимизированный чит LOOOL для Roblox
-getgenv().Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/jensonhirst/Rayfield/refs/heads/main/source'))()
+-- Полный чит LOOOL с правильной ссылкой Rayfield
+local Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/jensonhirst/Rayfield/refs/heads/main/source"))()
 
 local Window = Rayfield:CreateWindow({
    Name = "LOOOOL 🚀",
@@ -7,7 +7,7 @@ local Window = Rayfield:CreateWindow({
    LoadingSubtitle = "ALL LOAD!",
    ConfigurationSaving = {
       Enabled = true,
-      FolderName = "LOOOOL",
+      FolderName = "LOOOOL", 
       FileName = "Config"
    },
    Discord = {
@@ -24,6 +24,7 @@ getgenv().Fly = false
 getgenv().Spinbot = false
 getgenv().ESP = false
 getgenv().Invisible = false
+getgenv().InfJump = false
 
 -- ОПТИМИЗАЦИЯ: Отключаем тени и детализацию
 local Lighting = game:GetService("Lighting")
@@ -50,35 +51,12 @@ MainTab:CreateToggle({
    Callback = function(Value)
         getgenv().Invisible = Value
         SafeCall(function()
-            if Value then
-                local char = LocalPlayer.Character
-                if char then
-                    for _, part in ipairs(char:GetDescendants()) do
-                        if part:IsA("BasePart") then
-                            part.Transparency = 1
-                            part.CanCollide = false
-                            part.Material = Enum.Material.Glass
-                        end
-                    end
-                    -- Скрываем имя и эффекты
-                    local hum = char:FindFirstChildOfClass("Humanoid")
-                    if hum then
-                        hum.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
-                    end
-                end
-            else
-                local char = LocalPlayer.Character
-                if char then
-                    for _, part in ipairs(char:GetDescendants()) do
-                        if part:IsA("BasePart") then
-                            part.Transparency = 0
-                            part.CanCollide = true
-                            part.Material = Enum.Material.Plastic
-                        end
-                    end
-                    local hum = char:FindFirstChildOfClass("Humanoid")
-                    if hum then
-                        hum.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.Viewer
+            local char = LocalPlayer.Character
+            if char then
+                for _, part in ipairs(char:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.Transparency = Value and 1 or 0
+                        part.CanCollide = not Value
                     end
                 end
             end
@@ -93,20 +71,18 @@ MainTab:CreateToggle({
    Callback = function(Value)
         getgenv().Spinbot = Value
         SafeCall(function()
-            if Value then
-                local char = LocalPlayer.Character
-                if char then
-                    local root = char:FindFirstChild("HumanoidRootPart")
-                    if root then
-                        spawn(function()
-                            while getgenv().Spinbot and root do
-                                RunService.RenderStepped:Wait()
-                                root.CFrame = root.CFrame * CFrame.Angles(0, math.rad(30), 0)
-                            end
-                        end)
+            spawn(function()
+                while getgenv().Spinbot do
+                    RunService.RenderStepped:Wait()
+                    local char = LocalPlayer.Character
+                    if char then
+                        local root = char:FindFirstChild("HumanoidRootPart")
+                        if root then
+                            root.CFrame = root.CFrame * CFrame.Angles(0, math.rad(50), 0)
+                        end
                     end
                 end
-            end
+            end)
         end)
    end,
 })
@@ -208,7 +184,7 @@ local PlayerDropdown = MainTab:CreateDropdown({
    end,
 })
 
--- Массовая телепортация
+-- Массовая телепортация ко мне
 MainTab:CreateButton({
    Name = "⚡ Телепортировать ВСЕХ ко мне",
    Callback = function()
@@ -219,7 +195,7 @@ MainTab:CreateButton({
                     if player ~= LocalPlayer and player.Character then
                         local targetRoot = player.Character:FindFirstChild("HumanoidRootPart")
                         if targetRoot then
-                            targetRoot.CFrame = myRoot.CFrame + Vector3.new(math.random(-10, 10), 0, math.random(-10, 10))
+                            targetRoot.CFrame = myRoot.CFrame + Vector3.new(math.random(-5, 5), 0, math.random(-5, 5))
                         end
                     end
                 end
@@ -302,18 +278,10 @@ VisualTab:CreateToggle({
                                     highlight.Adornee = char
                                 end
                             end
-                            -- Удаляем Highlight при отключении
-                            if player.Character then
-                                local highlight = player.Character:FindFirstChildOfClass("Highlight")
-                                if highlight then
-                                    highlight:Destroy()
-                                end
-                            end
                         end)
                     end
                 end
             else
-                -- Удаляем все Highlight
                 for _, player in ipairs(Players:GetPlayers()) do
                     if player.Character then
                         local highlight = player.Character:FindFirstChildOfClass("Highlight")
@@ -378,18 +346,10 @@ VisualTab:CreateToggle({
    CurrentValue = false,
    Callback = function(Value)
         getgenv().InfJump = Value
-        SafeCall(function()
-            local UIS = game:GetService("UserInputService")
-            UIS.JumpRequest:Connect(function()
-                if getgenv().InfJump then
-                    LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
-                end
-            end)
-        end)
    end,
 })
 
--- Анимции
+-- Анимации
 VisualTab:CreateDropdown({
    Name = "💃 Анимации",
    Options = {"Попрыгунчик", "Танец1", "Танец2", "Стойка", "Зомби"},
@@ -483,8 +443,15 @@ spawn(function()
     end
 end)
 
+-- Обработчик бесконечного прыжка
+game:GetService("UserInputService").JumpRequest:connect(function()
+    if getgenv().InfJump then
+        LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+    end
+end)
+
 -- Защита от кика
-LocalPlayer.Idled:Connect(function()
+LocalPlayer.Idled:connect(function()
     VirtualUser:CaptureController()
     VirtualUser:ClickButton2(Vector2.new())
 end)
